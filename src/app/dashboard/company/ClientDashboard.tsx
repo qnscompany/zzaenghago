@@ -12,7 +12,9 @@ import {
     Info,
     MapPin,
     Building2,
-    Search
+    Search,
+    AlertCircle,
+    Hourglass
 } from 'lucide-react'
 
 export default function ClientDashboard({ leads }: { leads: any[] }) {
@@ -80,8 +82,34 @@ export default function ClientDashboard({ leads }: { leads: any[] }) {
         }
     }, [leads, isLoaded]);
 
+    if (error) {
+        return (
+            <div className="w-full h-[600px] bg-[#0a0a0a] rounded-[40px] flex flex-col items-center justify-center border border-white/10 p-12 text-center">
+                <div className="p-4 bg-red-500/10 rounded-full text-red-400 mb-6">
+                    <AlertCircle size={40} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">지도 로드 실패</h3>
+                <p className="text-white/40 max-w-md leading-relaxed mb-8">
+                    카카오맵 스크립트를 불러올 수 없습니다. API 키가 올바른지, 그리고 현재 도메인이 카카오 개발자 콘솔에 등록되어 있는지 확인해주세요.
+                </p>
+                <div className="bg-white/5 p-6 rounded-2xl text-left text-xs font-mono text-white/60 space-y-2">
+                    <p>1. <a href="https://developers.kakao.com" target="_blank" className="text-accent underline">카카오 개발자 콘솔</a> 접속</p>
+                    <p>2. 내 애플리케이션 {">"} 앱 설정 {">"} 플랫폼</p>
+                    <p>3. 웹 플랫폼에 현재 주소 추가 (예: localhost:3000)</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="relative w-full h-[calc(100vh-200px)] min-h-[600px] bg-[#0a0a0a] rounded-[40px] overflow-hidden border border-white/10">
+            {loading && (
+                <div className="absolute inset-0 z-50 bg-[#0a0a0a] flex flex-col items-center justify-center gap-4">
+                    <Hourglass className="text-accent animate-spin-slow" size={40} />
+                    <p className="text-white/40 font-bold animate-pulse">지도를 불러오는 중...</p>
+                </div>
+            )}
+
             {/* Kakao Map */}
             <Map
                 center={mapCenter}
