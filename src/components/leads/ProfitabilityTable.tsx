@@ -28,6 +28,7 @@ export default function ProfitabilityTable({
         if (loanAmount <= 0) return 0;
         const r = interestRate / 100;
         const n = 15; // 15 years
+        if (r === 0) return loanAmount / n;
         return loanAmount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     }, [loanAmount, interestRate]);
 
