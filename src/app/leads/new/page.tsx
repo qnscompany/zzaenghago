@@ -272,13 +272,32 @@ export default function NewLeadPage() {
                                 <div>
                                     <label className="block text-sm font-medium mb-2 flex items-center gap-2">
                                         <Calendar size={16} className="text-accent" />
-                                        희망 착공일
+                                        희망 준공 시기
                                     </label>
-                                    <input
-                                        name="desired_start"
-                                        type="date"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all"
-                                    />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="relative">
+                                            <select
+                                                name="desired_completion_year"
+                                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none text-white text-sm"
+                                            >
+                                                <option value="" className="bg-[#111111]">연도 선택</option>
+                                                <option value="2025" className="bg-[#111111]">2025년</option>
+                                                <option value="2026" className="bg-[#111111]">2026년</option>
+                                                <option value="2027" className="bg-[#111111]">2027년</option>
+                                                <option value="2028" className="bg-[#111111]">2028년</option>
+                                            </select>
+                                        </div>
+                                        <div className="relative">
+                                            <select
+                                                name="desired_completion_half"
+                                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none text-white text-sm"
+                                            >
+                                                <option value="" className="bg-[#111111]">상/하반기</option>
+                                                <option value="H1" className="bg-[#111111]">상반기</option>
+                                                <option value="H2" className="bg-[#111111]">하반기</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

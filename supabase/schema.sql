@@ -37,7 +37,8 @@ CREATE TABLE public.leads (
   desired_capacity_kw NUMERIC, -- renamed and optional
   project_type project_type NOT NULL,
   budget_range TEXT,
-  desired_start DATE,
+  desired_completion_year INT, -- NEW
+  desired_completion_half TEXT, -- NEW (H1/H2)
   ownership_type TEXT, -- NEW: self/family
   applicant_job_type TEXT, -- NEW: employee/business/farmer/unemployed
   wants_financial_info BOOLEAN DEFAULT FALSE, -- NEW
