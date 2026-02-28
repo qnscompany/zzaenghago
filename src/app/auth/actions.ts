@@ -39,33 +39,14 @@ export async function signup(formData: FormData) {
         options: {
             data: {
                 role: role,
+                company_name: role === 'company' ? company_name : undefined,
+                business_number: role === 'company' ? business_number : undefined,
             },
         },
     })
 
     if (error) {
         redirect('/auth/signup?error=' + encodeURIComponent(error.message))
-    }
-
-    // If role is company, we need to insert into companies table
-    // This is handled by a combination of the user trigger (public.users) 
-    // and manual insertion for company-specific fields if needed, 
-    // but since we want to be atomic, we'll do it here or via a webhook.
-    // For MVP, we'll do it here if sign up was successful.
-    if (data.user && role === 'company') {
-        const { error: companyError } = await supabase
-            .from('companies')
-            .insert({
-                user_id: data.user.id,
-                company_name,
-                business_number,
-                is_verified: false,
-            })
-
-        if (companyError) {
-            // In a real app, you'd want to rollback or handle this better
-            console.error('Error creating company profile:', companyError)
-        }
     }
 
     revalidatePath('/', 'layout')

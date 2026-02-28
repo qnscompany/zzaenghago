@@ -25,7 +25,8 @@ export default async function CompanyDashboardPage() {
         redirect('/auth/login');
     }
 
-    if (user.user_metadata.role !== 'company') {
+    const userRole = user.user_metadata.role;
+    if (userRole !== 'company' && userRole !== 'admin') {
         redirect('/');
     }
 

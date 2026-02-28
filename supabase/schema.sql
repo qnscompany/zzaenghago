@@ -24,6 +24,14 @@ CREATE TABLE public.companies (
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   company_name TEXT NOT NULL,
   business_number TEXT NOT NULL,
+  contact_name TEXT,
+  contact_phone TEXT,
+  contact_email TEXT,
+  homepage TEXT,
+  cumulative_capacity TEXT,
+  construction_eval_amount TEXT,
+  warranty_period TEXT,
+  technician_count TEXT,
   is_verified BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -101,18 +109,28 @@ CREATE POLICY "Company and Admin can view leads" ON public.leads
 -- Function to handle user creation with robust role casting and Admin check
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_role public.user_role;
 BEGIN
+  v_role := CASE 
+    WHEN new.email = 'qnscompany88@gmail.com' THEN 'admin'::public.user_role
+    WHEN (new.raw_user_meta_data->>'role') = 'company' THEN 'company'::public.user_role
+    WHEN (new.raw_user_meta_data->>'role') = 'admin' THEN 'admin'::public.user_role
+    ELSE 'customer'::public.user_role
+  END;
+
   INSERT INTO public.users (id, email, role)
-  VALUES (
-    new.id,
-    new.email,
-    CASE 
-      WHEN new.email = 'qnscompany88@gmail.com' THEN 'admin'::public.user_role
-      WHEN (new.raw_user_meta_data->>'role') = 'company' THEN 'company'::public.user_role
-      WHEN (new.raw_user_meta_data->>'role') = 'admin' THEN 'admin'::public.user_role
-      ELSE 'customer'::public.user_role
-    END
-  );
+  VALUES (new.id, new.email, v_role);
+
+  IF v_role = 'company' THEN
+    INSERT INTO public.companies (user_id, company_name, business_number)
+    VALUES (
+      new.id, 
+      COALESCE(new.raw_user_meta_data->>'company_name', '회사명 미등록'), 
+      COALESCE(new.raw_user_meta_data->>'business_number', '000-00-00000')
+    );
+  END IF;
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -131,6 +149,14 @@ CREATE TABLE public.profile_updates (
   company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
   new_company_name TEXT,
   new_business_number TEXT,
+  new_contact_name TEXT,
+  new_contact_phone TEXT,
+  new_contact_email TEXT,
+  new_homepage TEXT,
+  new_cumulative_capacity TEXT,
+  new_construction_eval_amount TEXT,
+  new_warranty_period TEXT,
+  new_technician_count TEXT,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   handled_at TIMESTAMPTZ,

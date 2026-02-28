@@ -18,6 +18,14 @@ export async function submitProfileUpdate(prevState: ActionState, formData: Form
 
     const company_name = formData.get('company_name') as string;
     const business_number = formData.get('business_number') as string;
+    const contact_name = formData.get('contact_name') as string;
+    const contact_phone = formData.get('contact_phone') as string;
+    const contact_email = formData.get('contact_email') as string;
+    const homepage = formData.get('homepage') as string;
+    const cumulative_capacity = formData.get('cumulative_capacity') as string;
+    const construction_eval_amount = formData.get('construction_eval_amount') as string;
+    const warranty_period = formData.get('warranty_period') as string;
+    const technician_count = formData.get('technician_count') as string;
 
     // Get company id
     const { data: company } = await supabase
@@ -34,6 +42,14 @@ export async function submitProfileUpdate(prevState: ActionState, formData: Form
             company_id: company.id,
             new_company_name: company_name,
             new_business_number: business_number,
+            new_contact_name: contact_name,
+            new_contact_phone: contact_phone,
+            new_contact_email: contact_email,
+            new_homepage: homepage,
+            new_cumulative_capacity: cumulative_capacity,
+            new_construction_eval_amount: construction_eval_amount,
+            new_warranty_period: warranty_period,
+            new_technician_count: technician_count,
             status: 'pending'
         });
 
