@@ -11,41 +11,65 @@ interface ProfitabilityTableProps {
 }
 
 export default function ProfitabilityTable({
-    capacityKw,
-    totalAmount,
+    capacityKw = 0,
+    totalAmount = 0,
     equityRatio = 30,
     interestRate = 3.5,
     sellingPrice = 189
 }: ProfitabilityTableProps) {
-    const annualGeneration = capacityKw * 3.6 * 365
-    const annualRevenue = annualGeneration * sellingPrice
-    const annualOem = annualRevenue * 0.10 // 10% O&M
+    // Basic safety checks for inputs
+    const safeCapacity = Math.max(0, capacityKw || 0);
+    const safeTotalAmount = Math.max(0, totalAmount || 0);
 
-    const equityAmount = totalAmount * (equityRatio / 100)
-    const loanAmount = totalAmount - equityAmount
+    const annualGeneration = safeCapacity * 3.6 * 365;
+    const annualRevenue = annualGeneration * sellingPrice;
+    const annualOem = annualRevenue * 0.10; // 10% O&M
+
+    const equityAmount = safeTotalAmount * (equityRatio / 100);
+    const loanAmount = Math.max(0, safeTotalAmount - equityAmount);
 
     const annualDebtService = useMemo(() => {
         if (loanAmount <= 0) return 0;
-        const r = interestRate / 100;
+        const r = (interestRate || 0) / 100;
         const n = 15; // 15 years
-        if (r === 0) return loanAmount / n;
-        return loanAmount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        if (r <= 0) return loanAmount / n;
+
+        try {
+            const powTerm = Math.pow(1 + r, n);
+            const denominator = powTerm - 1;
+            if (denominator === 0) return loanAmount / n;
+            return loanAmount * (r * powTerm) / denominator;
+        } catch (e) {
+            return loanAmount / n;
+        }
     }, [loanAmount, interestRate]);
 
     const yearlyData = useMemo(() => {
+        const data = [];
         let cumulative = -equityAmount;
-        return Array.from({ length: 20 }, (_, i) => {
-            const year = i + 1;
+
+        for (let i = 1; i <= 20; i++) {
+            const year = i;
             const revenue = annualRevenue;
             const oem = annualOem;
             const debt = year <= 15 ? annualDebtService : 0;
             const netFlow = revenue - oem - debt;
             cumulative += netFlow;
-            return { year, revenue, oem, debt, netFlow, cumulative };
-        });
+
+            data.push({
+                year,
+                revenue: isNaN(revenue) ? 0 : revenue,
+                oem: isNaN(oem) ? 0 : oem,
+                debt: isNaN(debt) ? 0 : debt,
+                netFlow: isNaN(netFlow) ? 0 : netFlow,
+                cumulative: isNaN(cumulative) ? 0 : cumulative
+            });
+        }
+        return data;
     }, [equityAmount, annualRevenue, annualOem, annualDebtService]);
 
     const formatWon = (val: number) => {
+        if (isNaN(val) || !isFinite(val)) return '0원';
         return Math.floor(val / 10000).toLocaleString() + '만원';
     };
 

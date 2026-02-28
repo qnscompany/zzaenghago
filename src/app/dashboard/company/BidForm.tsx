@@ -82,7 +82,7 @@ export default function BidForm({ isOpen, onClose, lead }: BidFormProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-[1200px] w-[95vw] max-h-[90vh] overflow-y-auto bg-card border-white/10 text-card-foreground rounded-[40px] p-8 md:p-12">
+            <DialogContent className="max-w-[1600px] w-[95vw] max-h-[95vh] overflow-y-auto bg-card border-white/10 text-card-foreground rounded-[40px] p-8 md:p-16">
                 <DialogHeader>
                     <div className="flex items-center gap-3 mb-2 text-accent">
                         <BadgeDollarSign size={24} />
@@ -109,6 +109,20 @@ export default function BidForm({ isOpen, onClose, lead }: BidFormProps) {
                             <p className="text-sm font-bold">{state.error}</p>
                         </div>
                     )}
+
+                    {/* ROI 자동 생성 안내 */}
+                    <div className="p-6 bg-accent/10 border border-accent/20 rounded-[32px] flex items-start gap-4">
+                        <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent shrink-0">
+                            <Calculator size={24} />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="text-white font-bold text-sm italic">"20년 수익성 정밀 분석표 자동 생성 가이드"</h4>
+                            <p className="text-white/60 text-xs leading-relaxed">
+                                입력하신 <span className="text-accent font-bold">설치 용량</span>과 <span className="text-accent font-bold">총 공사비</span>를 바탕으로 고객용 견적서 하단에 <span className="text-white font-bold">20개년 예상 수익(LCOE 기반) 분석표</span>가 자동으로 포함됩니다.
+                                <br />별도의 계산 없이도 고객에게 전문적인 금융 수익성을 제안할 수 있습니다.
+                            </p>
+                        </div>
+                    </div>
 
                     {/* 기본 정보 */}
                     <div className="grid md:grid-cols-2 gap-6">
