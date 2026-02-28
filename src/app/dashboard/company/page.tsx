@@ -1,15 +1,40 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { Search } from "lucide-react";
+import {
+    Building2,
+    CheckCircle2,
+    MapPin,
+    Maximize2,
+    Zap,
+    Calendar,
+    Clock,
+    ChevronRight,
+    Search,
+    AlertCircle,
+    UserCircle2
+} from "lucide-react";
+import ClientDashboard from "./ClientDashboard";
 
-export default async function CompanyDashboard() {
+export default async function CompanyDashboardPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user || user.user_metadata.role !== 'company') {
+    if (!user) {
+        redirect('/auth/login');
+    }
+
+    if (user.user_metadata.role !== 'company') {
         redirect('/');
     }
 
+    // Fetch company profile
+    const { data: company } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+    // Fetch open leads
     const { data: leads } = await supabase
         .from('leads')
         .select('*')
@@ -17,32 +42,61 @@ export default async function CompanyDashboard() {
         .order('created_at', { ascending: false });
 
     return (
-        <div className="pt-24 min-h-screen bg-background px-4">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-12">
-                    <h1 className="text-4xl font-bold font-outfit mb-2">시공업체 대시보드</h1>
-                    <p className="text-foreground/60">전국의 오픈된 태양광 리드를 확인하고 견적을 발송하세요.</p>
+        <div className="pt-24 pb-20 min-h-screen bg-background px-4">
+            <div className="max-w-6xl mx-auto">
+                {/* Company Profile Header */}
+                <div className="mb-12 p-8 bg-white/2 border border-white/10 rounded-[40px] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
+
+                    <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div className="flex items-center gap-5">
+                            <div className="w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                                <Building2 size={32} />
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h1 className="text-2xl md:text-3xl font-bold text-white">{company?.company_name || '회사명 미등록'}</h1>
+                                    {company?.is_verified && (
+                                        <div className="flex items-center gap-1 px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
+                                            <CheckCircle2 size={10} />
+                                            VERIFIED
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="text-foreground/40 text-sm flex items-center gap-1.5">
+                                    <UserCircle2 size={14} />
+                                    {user.email}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-8 py-2 md:py-0">
+                            <StatItem label="대기중 리드" value={leads?.length || 0} />
+                            <StatItem label="보낸 견적" value="0" />
+                        </div>
+                    </div>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 mb-8">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="bg-accent/10 p-3 rounded-2xl text-accent">
-                            <Search size={24} />
-                        </div>
-                        <h2 className="text-xl font-bold">오픈 리드 탐색</h2>
+                {/* Dashboard Tabs & Content */}
+                <div className="space-y-8">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                            <Search size={24} className="text-accent" />
+                            실시간 신규 부지 탐색
+                        </h2>
                     </div>
 
-                    {leads && leads.length > 0 ? (
-                        <div className="grid gap-4">
-                            {/* Lead list for companies */}
-                        </div>
-                    ) : (
-                        <div className="text-center py-12 text-foreground/40">
-                            현재 참여 가능한 새로운 리드가 없습니다.
-                        </div>
-                    )}
+                    <ClientDashboard leads={leads || []} />
                 </div>
             </div>
+        </div>
+    );
+}
+
+function StatItem({ label, value }: { label: string, value: string | number }) {
+    return (
+        <div className="text-center md:text-right">
+            <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">{label}</p>
+            <p className="text-3xl font-bold font-outfit text-white">{value}</p>
         </div>
     );
 }
