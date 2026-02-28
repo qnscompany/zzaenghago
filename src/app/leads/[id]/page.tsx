@@ -57,7 +57,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-background px-4">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-[1600px] mx-auto">
                 {/* Back Button */}
                 <Link href="/leads" className="inline-flex items-center gap-2 text-foreground/60 hover:text-accent transition-colors mb-8 group">
                     <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />

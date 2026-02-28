@@ -9,7 +9,7 @@ export default function Home() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-accent/5 rounded-full blur-3xl -z-10" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-semibold mb-8 border border-accent/20">
             <Zap size={16} />
             <span>상업용 태양광 비즈니스의 새로운 기준</span>

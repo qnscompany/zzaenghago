@@ -141,14 +141,18 @@ export default function BidForm({ isOpen, onClose, lead }: BidFormProps) {
                             <Label className="text-white/60 text-xs font-bold uppercase tracking-wider">총 공사비 (VAT 포함, 원)</Label>
                             <div className="relative">
                                 <Input
-                                    name="total_amount"
-                                    type="number"
-                                    value={totalAmount}
-                                    onChange={(e) => setTotalAmount(e.target.value)}
-                                    placeholder="예: 50000000"
+                                    name="total_amount_display"
+                                    type="text"
+                                    value={totalAmount ? parseInt(totalAmount).toLocaleString() : ''}
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/[^0-9]/g, '');
+                                        setTotalAmount(val);
+                                    }}
+                                    placeholder="예: 50,000,000"
                                     className="bg-white/5 border-white/10 rounded-xl pr-20"
                                     required
                                 />
+                                <input type="hidden" name="total_amount" value={totalAmount} />
                                 {unitPrice > 0 && (
                                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-accent font-bold">
                                         kW당 {Math.floor(unitPrice / 10000).toLocaleString()}만원

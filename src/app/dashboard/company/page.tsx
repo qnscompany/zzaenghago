@@ -55,7 +55,7 @@ export default async function CompanyDashboardPage() {
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-background px-4">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-[1600px] mx-auto">
                 {/* Company Profile Header */}
                 <div className="mb-12 p-8 bg-white/2 border border-white/10 rounded-[40px] relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
