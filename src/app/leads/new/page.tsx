@@ -17,7 +17,8 @@ import {
     Briefcase,
     BadgeDollarSign,
     CheckCircle2,
-    X
+    X,
+    ArrowRight
 } from 'lucide-react'
 import DaumPostcode from 'react-daum-postcode'
 
