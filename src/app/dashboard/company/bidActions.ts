@@ -50,6 +50,18 @@ export async function submitBid(prevState: BidActionState, formData: FormData): 
 
     if (!company) return { error: '시공사 정보를 찾을 수 없습니다.' };
 
+    // Check for existing bid
+    const { data: existingBid } = await supabase
+        .from('bids')
+        .select('id')
+        .eq('lead_id', lead_id)
+        .eq('company_id', company.id)
+        .maybeSingle();
+
+    if (existingBid) {
+        return { error: '이미 견적을 발송한 고객입니다.' };
+    }
+
     const { error } = await supabase
         .from('bids')
         .insert({

@@ -43,15 +43,31 @@ export default async function CompanyDashboardPage() {
         .eq('status', 'open')
         .order('created_at', { ascending: false });
 
+    // Fetch bids sent by this company to these leads
+    const { data: myBids } = await supabase
+        .from('bids')
+        .select('lead_id')
+        .eq('company_id', company?.id);
+
+    const bidsMap = new Set(myBids?.map(b => b.lead_id) || []);
+
+    const enhancedLeads = leads?.map(lead => ({
+        ...lead,
+        has_sent_bid: bidsMap.has(lead.id)
+    })) || [];
+
     console.log(`[Dashboard Debug] User ID: ${user.id}`);
     console.log(`[Dashboard Debug] User Role (Metadata): ${user.user_metadata.role}`);
-    console.log(`[Dashboard Debug] Leads Count: ${leads?.length || 0}`);
+    console.log(`[Dashboard Debug] Leads Count: ${enhancedLeads?.length || 0}`);
     if (leadsError) {
         console.error(`[Dashboard Debug] Leads Fetch Error:`, leadsError);
     }
-    if (leads && leads.length > 0) {
-        console.log(`[Dashboard] Sample lead address: ${leads[0].address}`);
+    if (enhancedLeads && enhancedLeads.length > 0) {
+        console.log(`[Dashboard] Sample lead address: ${enhancedLeads[0].address}, Has Sent: ${enhancedLeads[0].has_sent_bid}`);
     }
+
+    // Calculate "Sent Bids" count
+    const sentCount = myBids?.length || 0;
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-background px-4">
@@ -83,8 +99,8 @@ export default async function CompanyDashboardPage() {
                         </div>
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                             <div className="flex items-center gap-8 py-2 md:py-0">
-                                <StatItem label="대기중 리드" value={leads?.length || 0} />
-                                <StatItem label="보낸 견적" value="0" />
+                                <StatItem label="대기중 리드" value={enhancedLeads?.length || 0} />
+                                <StatItem label="보낸 견적" value={sentCount} />
                             </div>
                             <Link href="/dashboard/company/profile" className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-xs font-bold text-white/60 transition-all group">
                                 <Settings size={14} className="group-hover:rotate-90 transition-transform" />
@@ -104,7 +120,7 @@ export default async function CompanyDashboardPage() {
                     </div>
 
                     <ClientDashboard
-                        leads={leads || []}
+                        leads={enhancedLeads}
                         kakaoKey={process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || ""}
                     />
                 </div>

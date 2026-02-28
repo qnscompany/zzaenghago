@@ -161,15 +161,18 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                         >
                             <div
                                 className={`px-3 py-1.5 rounded-full border shadow-xl transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap
-                                    ${selectedLead?.id === lead.id
-                                        ? 'bg-accent border-white text-white scale-110 z-50'
-                                        : 'bg-[#111111]/90 backdrop-blur-md border-accent/40 text-accent hover:scale-105'}`}
+                                    ${lead.has_sent_bid
+                                        ? 'bg-green-500/20 border-green-500/40 text-green-400'
+                                        : selectedLead?.id === lead.id
+                                            ? 'bg-accent border-white text-white scale-110 z-50'
+                                            : 'bg-[#111111]/90 backdrop-blur-md border-accent/40 text-accent hover:scale-105'}`}
                                 onClick={() => setSelectedLead(lead)}
                             >
-                                <Building2 size={12} />
+                                {lead.has_sent_bid ? <ClipboardCheck size={12} /> : <Building2 size={12} />}
                                 <span className="text-[10px] font-bold">
                                     {lead.project_type === 'rooftop' ? '지붕' : lead.project_type === 'ground' ? '노지' : '영농형'}
                                     {` ${lead.desired_capacity_kw || ''}kW`}
+                                    {lead.has_sent_bid && " (발송완료)"}
                                 </span>
                             </div>
                         </CustomOverlayMap>
@@ -202,6 +205,12 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                                         {selectedLead.project_type === 'rooftop' ? '지붕 태양광' : selectedLead.project_type === 'ground' ? '노지 태양광' : '영농형 태양광'}
                                     </div>
                                     <span className="text-[10px] text-white/40 font-bold">{new Date(selectedLead.created_at).toLocaleDateString()}</span>
+                                    {selectedLead.has_sent_bid && (
+                                        <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold flex items-center gap-1 border border-green-500/20">
+                                            <ClipboardCheck size={10} />
+                                            발송 완료
+                                        </span>
+                                    )}
                                 </div>
                                 <h3 className="text-2xl font-bold text-white leading-tight">
                                     {selectedLead.address}
@@ -236,13 +245,20 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                             </p>
                         </div>
 
-                        <button
-                            onClick={() => setIsBidModalOpen(true)}
-                            className="w-full py-5 bg-accent text-white rounded-[24px] font-extrabold flex items-center justify-center gap-3 hover:bg-orange-500 transition-all shadow-xl shadow-accent/20 group"
-                        >
-                            <BadgeDollarSign size={20} className="group-hover:scale-110 transition-transform" />
-                            <span>견적 발송하기</span>
-                        </button>
+                        {selectedLead.has_sent_bid ? (
+                            <div className="w-full py-5 bg-white/5 border border-white/10 text-white/40 rounded-[24px] font-bold flex items-center justify-center gap-3 cursor-not-allowed">
+                                <ClipboardCheck size={20} />
+                                <span>이미 견적을 보낸 리드입니다</span>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsBidModalOpen(true)}
+                                className="w-full py-5 bg-accent text-white rounded-[24px] font-extrabold flex items-center justify-center gap-3 hover:bg-orange-500 transition-all shadow-xl shadow-accent/20 group"
+                            >
+                                <BadgeDollarSign size={20} className="group-hover:scale-110 transition-transform" />
+                                <span>견적 발송하기</span>
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center p-12 text-center opacity-30">

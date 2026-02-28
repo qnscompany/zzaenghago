@@ -75,6 +75,7 @@ CREATE TABLE public.bids (
   comment TEXT,
   status bid_status DEFAULT 'sent' NOT NULL,
   view_token UUID DEFAULT gen_random_uuid() UNIQUE NOT NULL,
+  UNIQUE(lead_id, company_id),
   token_used BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
