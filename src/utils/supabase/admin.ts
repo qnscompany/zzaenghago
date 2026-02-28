@@ -5,8 +5,10 @@ export const createAdminClient = () => {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceRoleKey) {
-        console.error("Missing Supabase Environment Variables for Admin Client");
-        throw new Error("Supabase environment variables are not configured correctly.");
+        if (process.env.NODE_ENV === 'development') {
+            console.warn("Missing Supabase Environment Variables for Admin Client");
+        }
+        return null;
     }
 
     return createClient(

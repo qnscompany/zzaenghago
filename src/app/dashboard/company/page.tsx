@@ -52,11 +52,12 @@ export default async function CompanyDashboardPage() {
         .select('lead_id')
         .eq('company_id', company?.id);
 
-    // Use admin client to fetch ALL bid lead_ids for accurate counting across ALL companies
+    // Use admin client to fetch ALL bid lead_ids for accurate counting if available
     const adminSupabase = createAdminClient();
+    const bidFetchClient = adminSupabase || supabase;
 
     // Fetch total bids count for each lead (from ANY company)
-    const { data: allBids } = await adminSupabase
+    const { data: allBids } = await bidFetchClient
         .from('bids')
         .select('lead_id');
 

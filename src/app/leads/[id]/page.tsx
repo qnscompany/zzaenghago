@@ -50,7 +50,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
     const permits = lead.permits_status || {};
 
     const adminSupabase = createAdminClient();
-    const { data: bids } = await adminSupabase
+    const fetchingClient = adminSupabase || supabase;
+    const { data: bids } = await fetchingClient
         .from('bids')
         .select(`
             *,

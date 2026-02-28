@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/utils/supabase/admin";
+import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -29,7 +30,8 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
             notFound();
         }
 
-        const supabase = createAdminClient();
+        const adminSupabase = createAdminClient();
+        const supabase = adminSupabase || await createClient();
 
         // Fetch bid with company and lead info using admin client (bypasses RLS)
         const { data: bid, error } = await supabase
