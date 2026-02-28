@@ -19,8 +19,15 @@ import {
 } from "lucide-react";
 import ProfitabilityTable from "@/components/leads/ProfitabilityTable";
 
-export default async function BidViewPage({ params }: { params: { token: string } }) {
+export default async function BidViewPage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params;
+
+    // UUID validation to prevent Supabase error
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(token)) {
+        notFound();
+    }
+
     const supabase = await createClient();
 
     // Fetch bid with company and lead info
@@ -34,7 +41,8 @@ export default async function BidViewPage({ params }: { params: { token: string 
         .eq('view_token', token)
         .single();
 
-    if (error || !bid) {
+    if (error || !bid || !bid.company || !bid.lead) {
+        console.error("Bid load error:", error);
         notFound();
     }
 
