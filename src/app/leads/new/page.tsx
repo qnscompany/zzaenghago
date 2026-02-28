@@ -176,15 +176,20 @@ export default function NewLeadPage() {
                                     <Building2 size={16} className="text-accent" />
                                     사업 유형
                                 </label>
-                                <select
-                                    name="project_type"
-                                    required
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none"
-                                >
-                                    <option value="rooftop" className="bg-background">건물 위 (지붕)</option>
-                                    <option value="ground" className="bg-background">노지 (땅)</option>
-                                    <option value="agri" className="bg-background">영농형 (농지)</option>
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        name="project_type"
+                                        required
+                                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none text-white"
+                                    >
+                                        <option value="rooftop" className="bg-[#111111] text-white">건물 위 (지붕)</option>
+                                        <option value="ground" className="bg-[#111111] text-white">노지 (땅)</option>
+                                        <option value="agri" className="bg-[#111111] text-white">영농형 (농지)</option>
+                                    </select>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                                        <Calculator size={16} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Section>
@@ -195,29 +200,39 @@ export default function NewLeadPage() {
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium mb-2">부지 소유주</label>
-                                    <select
-                                        name="ownership_type"
-                                        required
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none"
-                                    >
-                                        <option value="self" className="bg-background">본인 소유</option>
-                                        <option value="family" className="bg-background">가족 소유</option>
-                                        <option value="lease" className="bg-background">임차 부지</option>
-                                        <option value="other" className="bg-background">기타</option>
-                                    </select>
+                                    <div className="relative">
+                                        <select
+                                            name="ownership_type"
+                                            required
+                                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none text-white"
+                                        >
+                                            <option value="self" className="bg-[#111111] text-white">본인 소유</option>
+                                            <option value="family" className="bg-[#111111] text-white">가족 소유</option>
+                                            <option value="lease" className="bg-[#111111] text-white">임차 부지</option>
+                                            <option value="other" className="bg-[#111111] text-white">기타</option>
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                                            <UserIcon size={16} />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-2">신청자 직업 유형</label>
-                                    <select
-                                        name="applicant_job_type"
-                                        required
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none"
-                                    >
-                                        <option value="employee" className="bg-background">직장인</option>
-                                        <option value="business" className="bg-background">개인사업자</option>
-                                        <option value="farmer" className="bg-background">농어업인</option>
-                                        <option value="unemployed" className="bg-background">무직/기타</option>
-                                    </select>
+                                    <div className="relative">
+                                        <select
+                                            name="applicant_job_type"
+                                            required
+                                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none text-white"
+                                        >
+                                            <option value="employee" className="bg-[#111111] text-white">직장인</option>
+                                            <option value="business" className="bg-[#111111] text-white">개인사업자</option>
+                                            <option value="farmer" className="bg-[#111111] text-white">농어업인</option>
+                                            <option value="unemployed" className="bg-[#111111] text-white">무직/기타</option>
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                                            <Briefcase size={16} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
