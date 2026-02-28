@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk'
+import { Map, MapMarker, CustomOverlayMap, useKakaoLoader } from 'react-kakao-maps-sdk'
 import {
     Maximize2,
     Zap,
@@ -23,10 +23,15 @@ export default function ClientDashboard({ leads }: { leads: any[] }) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     // Kakao Maps API key from env
-    const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY;
+    const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || "";
+
+    const [loading, error] = useKakaoLoader({
+        appkey: KAKAO_KEY,
+        libraries: ["services", "clusterer", "drawing"],
+    });
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && window.kakao) {
+        if (!loading && !error && typeof window !== 'undefined' && window.kakao) {
             const geocoder = new window.kakao.maps.services.Geocoder();
 
             const geocodeLeads = async () => {
