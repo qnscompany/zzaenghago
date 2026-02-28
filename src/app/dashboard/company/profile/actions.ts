@@ -3,7 +3,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function submitProfileUpdate(formData: FormData) {
+export type ActionState = {
+    error?: string;
+    success?: boolean;
+} | null;
+
+export async function submitProfileUpdate(prevState: ActionState, formData: FormData): Promise<ActionState> {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 

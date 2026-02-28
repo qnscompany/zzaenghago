@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { submitProfileUpdate } from './actions'
+import { submitProfileUpdate, type ActionState } from './actions'
 import { Hourglass, CheckCircle2, AlertCircle } from 'lucide-react'
 
 interface ProfileFormProps {
@@ -11,7 +11,7 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ companyName, businessNumber, isPending: initialIsPending }: ProfileFormProps) {
-    const [state, formAction, isPending] = useActionState(submitProfileUpdate, null);
+    const [state, formAction, isPending] = useActionState<ActionState, FormData>(submitProfileUpdate, null);
 
     const actualIsPending = initialIsPending || isPending;
 
