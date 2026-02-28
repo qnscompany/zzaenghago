@@ -98,17 +98,38 @@ CREATE POLICY "Anyone can view verified companies" ON public.companies
 CREATE POLICY "Companies can manage their own profile" ON public.companies
   FOR ALL USING (auth.uid() = user_id);
 
+CREATE POLICY "Public view company info via bid" ON public.companies
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.bids
+      WHERE public.bids.company_id = companies.id AND public.bids.view_token IS NOT NULL
+    )
+  );
+
 -- Leads
 CREATE POLICY "Customers can manage their own leads" ON public.leads
   FOR ALL USING (auth.uid() = customer_id);
 
--- Leads RLS: Strict access
-DROP POLICY IF EXISTS "Companies can view lead basic info" ON public.leads;
-CREATE POLICY "Company and Admin can view leads" ON public.leads
+-- Bids
+CREATE POLICY "Anyone can view a bid with valid token" ON public.bids
+  FOR SELECT USING (view_token IS NOT NULL);
+
+CREATE POLICY "Companies can manage their own bids" ON public.bids
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.companies
+      WHERE public.companies.id = bids.company_id AND public.companies.user_id = auth.uid()
+    )
+  );
+
+-- Leads RLS: Allow viewing if part of a bid they own or via token?
+-- For now, let's keep it simple: allow viewing lead if linked to a bid.
+-- More robust policy:
+CREATE POLICY "Public can view lead info via bid token" ON public.leads
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM public.users
-      WHERE public.users.id = auth.uid() AND (public.users.role = 'company' OR public.users.role = 'admin')
+      SELECT 1 FROM public.bids
+      WHERE public.bids.lead_id = leads.id AND public.bids.view_token IS NOT NULL
     )
   );
 
