@@ -11,7 +11,8 @@ import {
     ChevronRight,
     AlertCircle,
     Building2,
-    CheckCircle2
+    CheckCircle2,
+    Calendar
 } from "lucide-react";
 
 export default async function LeadsPage() {
