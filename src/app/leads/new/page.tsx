@@ -281,10 +281,11 @@ export default function NewLeadPage() {
                                                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-accent/50 focus:outline-none transition-all appearance-none text-white text-sm"
                                             >
                                                 <option value="" className="bg-[#111111]">연도 선택</option>
-                                                <option value="2025" className="bg-[#111111]">2025년</option>
                                                 <option value="2026" className="bg-[#111111]">2026년</option>
                                                 <option value="2027" className="bg-[#111111]">2027년</option>
                                                 <option value="2028" className="bg-[#111111]">2028년</option>
+                                                <option value="2029" className="bg-[#111111]">2029년</option>
+                                                <option value="2030" className="bg-[#111111]">2030년</option>
                                             </select>
                                         </div>
                                         <div className="relative">
