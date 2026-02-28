@@ -82,7 +82,7 @@ export default function BidForm({ isOpen, onClose, lead }: BidFormProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0f0f0f] border-white/10 text-white rounded-[32px]">
+            <DialogContent className="max-w-[1200px] w-[95vw] max-h-[90vh] overflow-y-auto bg-card border-white/10 text-card-foreground rounded-[40px] p-8 md:p-12">
                 <DialogHeader>
                     <div className="flex items-center gap-3 mb-2 text-accent">
                         <BadgeDollarSign size={24} />
