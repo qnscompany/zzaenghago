@@ -29,11 +29,17 @@ export default function ClientDashboard({ leads }: { leads: any[] }) {
 
     const [loading, error] = useKakaoLoader({
         appkey: KAKAO_KEY,
-        libraries: ["services", "clusterer", "drawing"],
+        libraries: ["services"], // Minimal set
     });
 
     useEffect(() => {
-        console.log("Kakao Map Loading State:", { loading, error, hasKakao: !!window.kakao });
+        console.log("Kakao Map Debug Info:", {
+            hasKey: !!KAKAO_KEY,
+            keyHead: KAKAO_KEY?.slice(0, 5),
+            loading,
+            error: error?.message || error,
+            hasKakao: !!(typeof window !== 'undefined' && window.kakao)
+        });
 
         if (!loading && !error && typeof window !== 'undefined' && window.kakao) {
             console.log("Kakao SDK loaded successfully. Initializing Geocoder...");
