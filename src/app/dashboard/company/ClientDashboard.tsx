@@ -16,9 +16,10 @@ import {
     AlertCircle,
     Hourglass
 } from 'lucide-react'
-import BidForm from './BidForm'
+import { useRouter } from 'next/navigation'
 
 export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kakaoKey: string }) {
+    const router = useRouter();
     const [selectedLead, setSelectedLead] = useState<any>(null);
     const [isBidModalOpen, setIsBidModalOpen] = useState(false);
     const [geocodedLeads, setGeocodedLeads] = useState<any[]>([]);
@@ -252,11 +253,11 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                             </div>
                         ) : (
                             <button
-                                onClick={() => setIsBidModalOpen(true)}
+                                onClick={() => router.push(`/dashboard/company/leads/${selectedLead.id}/bid`)}
                                 className="w-full py-5 bg-accent text-white rounded-[24px] font-extrabold flex items-center justify-center gap-3 hover:bg-orange-500 transition-all shadow-xl shadow-accent/20 group"
                             >
                                 <BadgeDollarSign size={20} className="group-hover:scale-110 transition-transform" />
-                                <span>견적 발송하기</span>
+                                <span>견적서 작성하러 가기</span>
                             </button>
                         )}
                     </div>
@@ -274,15 +275,7 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                 )}
             </div>
 
-            {/* Bidding Modal */}
-            {selectedLead && (
-                <BidForm
-                    key={selectedLead.id}
-                    isOpen={isBidModalOpen}
-                    onClose={() => setIsBidModalOpen(false)}
-                    lead={selectedLead}
-                />
-            )}
+            {/* Bidding Modal removed in favor of dedicated page */}
         </div>
     )
 }

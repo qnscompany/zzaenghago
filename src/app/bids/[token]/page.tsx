@@ -29,7 +29,7 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
             notFound();
         }
 
-        const supabase = await createAdminClient();
+        const supabase = createAdminClient();
 
         // Fetch bid with company and lead info using admin client (bypasses RLS)
         const { data: bid, error } = await supabase
