@@ -1,5 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { notFound, redirect } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import {
     MapPin,
@@ -46,7 +49,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
     const permits = lead.permits_status || {};
 
-    const { data: bids } = await supabase
+    const adminSupabase = createAdminClient();
+    const { data: bids } = await adminSupabase
         .from('bids')
         .select(`
             *,

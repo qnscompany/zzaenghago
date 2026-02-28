@@ -115,6 +115,14 @@ CREATE POLICY "Customers can manage their own leads" ON public.leads
 CREATE POLICY "Anyone can view a bid with valid token" ON public.bids
   FOR SELECT USING (view_token IS NOT NULL);
 
+CREATE POLICY "Customers can view bids for their own leads" ON public.bids
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.leads
+      WHERE public.leads.id = bids.lead_id AND public.leads.customer_id = auth.uid()
+    )
+  );
+
 CREATE POLICY "Companies can manage their own bids" ON public.bids
   FOR ALL USING (
     EXISTS (

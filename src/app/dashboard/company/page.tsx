@@ -1,5 +1,5 @@
-import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { createAdminClient } from "@/utils/supabase/admin";
 import {
     Building2,
     CheckCircle2,
@@ -16,6 +16,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ClientDashboard from "./ClientDashboard";
+import { createClient } from "@/utils/supabase/server";
+
+export const dynamic = 'force-dynamic';
 
 export default async function CompanyDashboardPage() {
     const supabase = await createClient();
@@ -49,8 +52,11 @@ export default async function CompanyDashboardPage() {
         .select('lead_id')
         .eq('company_id', company?.id);
 
+    // Use admin client to fetch ALL bid lead_ids for accurate counting across ALL companies
+    const adminSupabase = createAdminClient();
+
     // Fetch total bids count for each lead (from ANY company)
-    const { data: allBids } = await supabase
+    const { data: allBids } = await adminSupabase
         .from('bids')
         .select('lead_id');
 
