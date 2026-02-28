@@ -16,7 +16,8 @@ import {
     ChevronLeft,
     Clock,
     AlertCircle,
-    CheckCircle2
+    CheckCircle2,
+    Search
 } from "lucide-react";
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
@@ -209,8 +210,8 @@ function InfoCard({ icon, label, value }: { icon: React.ReactNode, label: string
 function StatusBadge({ label, active }: { label: string, active: boolean }) {
     return (
         <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${active
-                ? 'bg-accent/20 border-accent/40 text-white'
-                : 'bg-white/2 border-white/5 text-foreground/30'
+            ? 'bg-accent/20 border-accent/40 text-white'
+            : 'bg-white/2 border-white/5 text-foreground/30'
             }`}>
             {active && <CheckCircle2 size={14} className="text-accent" />}
             {label}
