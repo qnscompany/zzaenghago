@@ -1,10 +1,11 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { login } from '../actions'
 import { useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+function LoginContent() {
     const searchParams = useSearchParams()
     const error = searchParams.get('error')
     const message = searchParams.get('message')
@@ -71,5 +72,17 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-background px-4">
+                <div className="animate-pulse text-accent font-bold font-outfit">로딩 중...</div>
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     )
 }

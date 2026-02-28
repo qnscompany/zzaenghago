@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { signup } from '../actions'
 import { useSearchParams } from 'next/navigation'
 import { User, Building2, CheckCircle2 } from 'lucide-react'
 
-export default function SignupPage() {
+function SignupContent() {
     const [role, setRole] = useState<'customer' | 'company'>('customer')
     const searchParams = useSearchParams()
     const error = searchParams.get('error')
@@ -124,5 +124,17 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+                <div className="animate-pulse text-accent font-bold font-outfit">로딩 중...</div>
+            </div>
+        }>
+            <SignupContent />
+        </Suspense>
     )
 }
