@@ -31,15 +31,25 @@ export default function ClientDashboard({ leads }: { leads: any[] }) {
     });
 
     useEffect(() => {
+        console.log("Kakao Map Loading State:", { loading, error, hasKakao: !!window.kakao });
+
         if (!loading && !error && typeof window !== 'undefined' && window.kakao) {
+            console.log("Kakao SDK loaded successfully. Initializing Geocoder...");
             const geocoder = new window.kakao.maps.services.Geocoder();
 
             const geocodeLeads = async () => {
+                console.log("Starting geocoding for leads count:", leads.length);
+                if (leads.length === 0) {
+                    console.warn("No leads to geocode - leads array is empty.");
+                    return;
+                }
+
                 const results = await Promise.all(
                     leads.map(async (lead) => {
                         return new Promise((resolve) => {
                             geocoder.addressSearch(lead.address, (result: any, status: any) => {
                                 if (status === window.kakao.maps.services.Status.OK) {
+                                    console.log(`✅ Geocoding SUCCESS: ${lead.address} -> ${result[0].y}, ${result[0].x}`);
                                     resolve({
                                         ...lead,
                                         position: {
@@ -48,7 +58,8 @@ export default function ClientDashboard({ leads }: { leads: any[] }) {
                                         }
                                     });
                                 } else {
-                                    // Fallback if geocoding fails (random offset for demo if invalid address)
+                                    console.error(`❌ Geocoding FAILED: ${lead.address}. Status:`, status);
+                                    // If status is 'ERROR', it might be an API key issue or domain restriction
                                     resolve(null);
                                 }
                             });

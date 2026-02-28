@@ -36,12 +36,16 @@ export default async function CompanyDashboardPage() {
         .eq('user_id', user.id)
         .single();
 
-    // Fetch open leads
     const { data: leads } = await supabase
         .from('leads')
         .select('*')
         .eq('status', 'open')
         .order('created_at', { ascending: false });
+
+    console.log(`[Dashboard] Fetched ${leads?.length || 0} open leads for user ${user.id}`);
+    if (leads && leads.length > 0) {
+        console.log(`[Dashboard] Sample lead address: ${leads[0].address}`);
+    }
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-background px-4">
