@@ -168,7 +168,7 @@ export default function ROIAnalysis({ capacityKw, totalAmount }: ROIAnalysisProp
             <div className="flex items-start gap-4 p-6 bg-orange-500/5 rounded-[32px] border border-orange-500/10">
                 <ShieldAlert size={20} className="text-orange-500 shrink-0 mt-0.5" />
                 <p className="text-xs text-white/40 leading-relaxed">
-                    "본 분석표는 참고용 시뮬레이션입니다. 실제 수익은 일조량, REC 가격 변동, 계통연계 조건에 따라 달라질 수 있으며, 투자 결정 전 반드시 전문가와 상담하세요."
+                    "본 수익성 분석 수치는 최초 견적 정보를 바탕으로 실시간 자동 계산된 참고용 시뮬레이션입니다. 실제 수익은 일조량, REC 가격 변동, 계통연계 조건 및 향후 시장 상황에 따라 달라질 수 있으므로 투자 결정 전 전문가와 상담하시기 바랍니다."
                 </p>
             </div>
         </div>

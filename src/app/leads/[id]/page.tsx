@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import ROIAnalysis from "@/components/leads/ROIAnalysis";
 
-export default async function LeadDetailPage({ params }: { params: { id: string } }) {
+export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -206,12 +206,18 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
                                                         <p className="text-[10px] text-white/40 mb-1 uppercase tracking-wider">총 공사비</p>
                                                         <p className="text-lg font-black text-white">{(bid.total_amount / 10000).toLocaleString()}만원</p>
                                                     </div>
-                                                    <Link
-                                                        href={`/bids/${bid.view_token}`}
-                                                        className="px-4 py-2 bg-accent/10 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all"
-                                                    >
-                                                        상세 보기
-                                                    </Link>
+                                                    {bid.view_token ? (
+                                                        <Link
+                                                            href={`/bids/${bid.view_token}`}
+                                                            className="px-4 py-2 bg-accent/10 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all"
+                                                        >
+                                                            상세 보기
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="px-3 py-1 bg-white/5 text-white/20 rounded-lg text-[10px] font-bold">
+                                                            조회 불가
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}

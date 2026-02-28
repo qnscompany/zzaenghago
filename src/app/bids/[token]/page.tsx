@@ -205,7 +205,7 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
                                 <div className="p-6 bg-orange-500/5 border border-orange-500/10 rounded-2xl flex items-start gap-4">
                                     <AlertCircle className="text-orange-500 shrink-0 mt-1" size={18} />
                                     <p className="text-xs text-white/40 leading-relaxed">
-                                        본 분석 데이터는 시공사에서 제공한 견적 내용을 바탕으로 한 시뮬레이션입니다. 실제 발전 시간과 한전 단가 변동에 따라 차이가 발생할 수 있습니다.
+                                        "본 수익성 분석 수치는 시공사에서 제공한 견적 내용을 바탕으로 실시간 자동 계산된 참고용 시뮬레이션입니다. 실제 발전량 및 수익은 일조량, 한전 단가 변동 및 향후 시장 상황에 따라 차이가 발생할 수 있습니다."
                                     </p>
                                 </div>
                             </div>

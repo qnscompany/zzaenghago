@@ -77,7 +77,7 @@ export default function BidFormPageClient({ lead, company }: { lead: any, compan
                 <div className="space-y-2 relative">
                     <h4 className="text-white text-xl font-black italic">"20년 수익성 정밀 분석표 자동 생성 가이드"</h4>
                     <p className="text-white/60 leading-relaxed">
-                        입력하신 <span className="text-accent font-bold">설치 용량</span>과 <span className="text-accent font-bold">총 공사비</span>를 바탕으로 고객용 견적서 하단에 <span className="text-white font-bold underline decoration-accent/40 decoration-4">20개년 예상 수익 분석표</span>가 실시간으로 생성되어 포함됩니다. 별도의 계산 없이 전문적인 금융 제안이 가능합니다.
+                        입력하신 <span className="text-accent font-bold">설치 용량</span>과 <span className="text-accent font-bold">총 공사비</span>를 바탕으로 실시간 자동 계산되는 <span className="text-white font-bold underline decoration-accent/40 decoration-4">20개년 예상 수익 분석표</span>가 고객 견적서에 포함됩니다. <span className="block mt-2 text-xs italic opacity-50 underline">* 본 수치는 최초 견적 정보를 바탕으로 실시간 자동 계산되며, 시장 상황에 따라 달라질 수 있음이 고객에게 명시됩니다.</span>
                     </p>
                 </div>
             </div>

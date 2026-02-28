@@ -173,7 +173,7 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                                 <span className="text-[10px] font-bold">
                                     {lead.project_type === 'rooftop' ? '지붕' : lead.project_type === 'ground' ? '노지' : '영농형'}
                                     {` ${lead.desired_capacity_kw || ''}kW`}
-                                    {lead.has_sent_bid && " (발송완료)"}
+                                    {lead.has_sent_bid ? " (발송완료)" : lead.total_bids_count > 0 ? ` (견적 ${lead.total_bids_count}개 받음)` : " (견적 대기중)"}
                                 </span>
                             </div>
                         </CustomOverlayMap>
@@ -205,11 +205,20 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                                     <div className="px-3 py-1 bg-accent/20 text-accent rounded-full text-[10px] font-bold uppercase tracking-widest">
                                         {selectedLead.project_type === 'rooftop' ? '지붕 태양광' : selectedLead.project_type === 'ground' ? '노지 태양광' : '영농형 태양광'}
                                     </div>
-                                    <span className="text-[10px] text-white/40 font-bold">{new Date(selectedLead.created_at).toLocaleDateString()}</span>
-                                    {selectedLead.has_sent_bid && (
+                                    {selectedLead.has_sent_bid ? (
                                         <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold flex items-center gap-1 border border-green-500/20">
                                             <ClipboardCheck size={10} />
                                             발송 완료
+                                        </span>
+                                    ) : selectedLead.total_bids_count > 0 ? (
+                                        <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-[10px] font-bold flex items-center gap-1 border border-accent/20">
+                                            <BadgeDollarSign size={10} />
+                                            견적 {selectedLead.total_bids_count}개 받음
+                                        </span>
+                                    ) : (
+                                        <span className="px-3 py-1 bg-white/5 text-white/40 rounded-full text-[10px] font-bold flex items-center gap-1 border border-white/10">
+                                            <Hourglass size={10} />
+                                            견적 대기중
                                         </span>
                                     )}
                                 </div>

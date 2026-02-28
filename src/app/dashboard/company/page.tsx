@@ -49,11 +49,23 @@ export default async function CompanyDashboardPage() {
         .select('lead_id')
         .eq('company_id', company?.id);
 
-    const bidsMap = new Set(myBids?.map(b => b.lead_id) || []);
+    // Fetch total bids count for each lead (from ANY company)
+    const { data: allBids } = await supabase
+        .from('bids')
+        .select('lead_id');
+
+    const myBidsMap = new Set(myBids?.map(b => b.lead_id) || []);
+
+    // Count bids per lead
+    const bidCountsMap: Record<string, number> = {};
+    allBids?.forEach(b => {
+        bidCountsMap[b.lead_id] = (bidCountsMap[b.lead_id] || 0) + 1;
+    });
 
     const enhancedLeads = leads?.map(lead => ({
         ...lead,
-        has_sent_bid: bidsMap.has(lead.id)
+        has_sent_bid: myBidsMap.has(lead.id),
+        total_bids_count: bidCountsMap[lead.id] || 0
     })) || [];
 
     console.log(`[Dashboard Debug] User ID: ${user.id}`);
