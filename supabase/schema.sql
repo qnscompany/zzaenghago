@@ -125,3 +125,40 @@ ALTER FUNCTION public.handle_new_user() SET search_path = public;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+-- Profile Updates table for Admin Approval
+CREATE TABLE public.profile_updates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  new_company_name TEXT,
+  new_business_number TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  handled_at TIMESTAMPTZ,
+  admin_comment TEXT
+);
+
+ALTER TABLE public.profile_updates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Companies can view their own updates" ON public.profile_updates
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.companies
+      WHERE public.companies.id = profile_updates.company_id AND public.companies.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Companies can submit updates" ON public.profile_updates
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.companies
+      WHERE public.companies.id = company_id AND public.companies.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Admins can view and manage all updates" ON public.profile_updates
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.users
+      WHERE public.users.id = auth.uid() AND public.users.role = 'admin'
+    )
+  );

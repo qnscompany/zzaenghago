@@ -11,8 +11,10 @@ import {
     ChevronRight,
     Search,
     AlertCircle,
-    UserCircle2
+    UserCircle2,
+    Settings
 } from "lucide-react";
+import Link from "next/link";
 import ClientDashboard from "./ClientDashboard";
 
 export default async function CompanyDashboardPage() {
@@ -31,7 +33,7 @@ export default async function CompanyDashboardPage() {
     const { data: company } = await supabase
         .from('companies')
         .select('*')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
 
     // Fetch open leads
@@ -69,9 +71,15 @@ export default async function CompanyDashboardPage() {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-8 py-2 md:py-0">
-                            <StatItem label="대기중 리드" value={leads?.length || 0} />
-                            <StatItem label="보낸 견적" value="0" />
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                            <div className="flex items-center gap-8 py-2 md:py-0">
+                                <StatItem label="대기중 리드" value={leads?.length || 0} />
+                                <StatItem label="보낸 견적" value="0" />
+                            </div>
+                            <Link href="/dashboard/company/profile" className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-xs font-bold text-white/60 transition-all group">
+                                <Settings size={14} className="group-hover:rotate-90 transition-transform" />
+                                정보 관리
+                            </Link>
                         </div>
                     </div>
                 </div>
