@@ -17,7 +17,7 @@ import {
     Hourglass
 } from 'lucide-react'
 
-export default function ClientDashboard({ leads }: { leads: any[] }) {
+export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kakaoKey: string }) {
     const [selectedLead, setSelectedLead] = useState<any>(null);
     const [isBidModalOpen, setIsBidModalOpen] = useState(false);
     const [geocodedLeads, setGeocodedLeads] = useState<any[]>([]);
@@ -87,6 +87,21 @@ export default function ClientDashboard({ leads }: { leads: any[] }) {
             geocodeLeads();
         }
     }, [leads, isLoaded]);
+
+    if (!KAKAO_KEY) {
+        return (
+            <div className="w-full h-[600px] bg-[#0a0a0a] rounded-[40px] flex flex-col items-center justify-center border border-white/10 p-12 text-center text-white">
+                <AlertCircle className="text-orange-500 mb-4" size={48} />
+                <h3 className="text-xl font-bold mb-2">API 키 누락</h3>
+                <p className="text-white/40 max-w-sm mb-6">
+                    지도를 불러오기 위한 JavaScript API 키가 설정되지 않았습니다. .env.local 또는 Vercel 환경 변수를 확인해주세요.
+                </p>
+                <code className="bg-white/5 px-4 py-2 rounded text-accent text-xs">
+                    NEXT_PUBLIC_KAKAO_MAP_API_KEY
+                </code>
+            </div>
+        );
+    }
 
     if (error) {
         return (

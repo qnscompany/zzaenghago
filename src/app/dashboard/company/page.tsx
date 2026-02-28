@@ -97,7 +97,10 @@ export default async function CompanyDashboardPage() {
                         </h2>
                     </div>
 
-                    <ClientDashboard leads={leads || []} />
+                    <ClientDashboard
+                        leads={leads || []}
+                        kakaoKey={process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || ""}
+                    />
                 </div>
             </div>
         </div>
