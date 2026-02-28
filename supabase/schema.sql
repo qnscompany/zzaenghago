@@ -32,6 +32,8 @@ CREATE TABLE public.companies (
   construction_eval_amount TEXT,
   warranty_period TEXT,
   technician_count TEXT,
+  head_office_address TEXT,
+  branch_office_address TEXT,
   is_verified BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -157,6 +159,8 @@ CREATE TABLE public.profile_updates (
   new_construction_eval_amount TEXT,
   new_warranty_period TEXT,
   new_technician_count TEXT,
+  new_head_office_address TEXT,
+  new_branch_office_address TEXT,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   handled_at TIMESTAMPTZ,

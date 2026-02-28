@@ -26,6 +26,8 @@ export async function submitProfileUpdate(prevState: ActionState, formData: Form
     const construction_eval_amount = formData.get('construction_eval_amount') as string;
     const warranty_period = formData.get('warranty_period') as string;
     const technician_count = formData.get('technician_count') as string;
+    const head_office_address = formData.get('head_office_address') as string;
+    const branch_office_address = formData.get('branch_office_address') as string;
 
     // Get company id
     const { data: company } = await supabase
@@ -50,6 +52,8 @@ export async function submitProfileUpdate(prevState: ActionState, formData: Form
             new_construction_eval_amount: construction_eval_amount,
             new_warranty_period: warranty_period,
             new_technician_count: technician_count,
+            new_head_office_address: head_office_address,
+            new_branch_office_address: branch_office_address,
             status: 'pending'
         });
 
