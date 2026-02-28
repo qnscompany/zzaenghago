@@ -123,115 +123,141 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
     }
 
     return (
-        <div className="relative w-full h-[calc(100vh-200px)] min-h-[600px] bg-[#0a0a0a] rounded-[40px] overflow-hidden border border-white/10">
-            {loading && (
-                <div className="absolute inset-0 z-50 bg-[#0a0a0a] flex flex-col items-center justify-center gap-4">
-                    <Hourglass className="text-accent animate-spin-slow" size={40} />
-                    <p className="text-white/40 font-bold animate-pulse">지도를 불러오는 중...</p>
-                </div>
-            )}
+        <div className="flex w-full h-[calc(100vh-200px)] min-h-[600px] bg-[#0a0a0a] rounded-[40px] overflow-hidden border border-white/10">
+            {/* Left Side: Map (2/3) */}
+            <div className="relative w-2/3 h-full border-r border-white/5">
+                {loading && (
+                    <div className="absolute inset-0 z-50 bg-[#0a0a0a] flex flex-col items-center justify-center gap-4">
+                        <Hourglass className="text-accent animate-spin-slow" size={40} />
+                        <p className="text-white/40 font-bold animate-pulse">지도를 불러오는 중...</p>
+                    </div>
+                )}
 
-            {/* Kakao Map */}
-            <Map
-                center={mapCenter}
-                style={{ width: "100%", height: "100%" }}
-                level={leads.length > 0 ? 8 : 10}
-                onCreate={() => setIsLoaded(true)}
-            >
-                {geocodedLeads.map((lead) => (
-                    <MapMarker
-                        key={lead.id}
-                        position={lead.position}
-                        onClick={() => setSelectedLead(lead)}
-                        image={{
-                            src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", // Temporarily using standard star, will customize below
-                            size: { width: 24, height: 35 },
-                        }}
-                    />
-                ))}
-
-                {geocodedLeads.map((lead) => (
-                    <CustomOverlayMap
-                        key={`overlay-${lead.id}`}
-                        position={lead.position}
-                        yAnchor={1.4}
-                    >
-                        <div
-                            className={`px-3 py-1.5 rounded-full border shadow-xl transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap
-                                ${selectedLead?.id === lead.id
-                                    ? 'bg-accent border-white text-white scale-110 z-50'
-                                    : 'bg-[#111111]/90 backdrop-blur-md border-accent/40 text-accent hover:scale-105'}`}
+                {/* Kakao Map */}
+                <Map
+                    center={mapCenter}
+                    style={{ width: "100%", height: "100%" }}
+                    level={leads.length > 0 ? 8 : 10}
+                    onCreate={() => setIsLoaded(true)}
+                >
+                    {geocodedLeads.map((lead) => (
+                        <MapMarker
+                            key={lead.id}
+                            position={lead.position}
                             onClick={() => setSelectedLead(lead)}
-                        >
-                            <Building2 size={12} />
-                            <span className="text-[10px] font-bold">
-                                {lead.project_type === 'rooftop' ? '지붕' : lead.project_type === 'ground' ? '노지' : '영농형'}
-                                {` ${lead.desired_capacity_kw || ''}kW`}
-                            </span>
-                        </div>
-                    </CustomOverlayMap>
-                ))}
-            </Map>
+                            image={{
+                                src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                                size: { width: 24, height: 35 },
+                            }}
+                        />
+                    ))}
 
-            {/* Float HUD: Search Leads */}
-            <div className="absolute top-6 left-6 z-10 flex items-center gap-3">
-                <div className="bg-[#111111]/80 backdrop-blur-md border border-white/10 px-6 py-3 rounded-[24px] flex items-center gap-3 shadow-2xl">
-                    <Search size={18} className="text-accent" />
-                    <input
-                        placeholder="지역 또는 주소 검색"
-                        className="bg-transparent border-none focus:outline-none text-sm text-white w-48 font-medium placeholder:text-white/20"
-                    />
-                </div>
-                <div className="bg-accent text-white px-4 py-3 rounded-[20px] font-bold text-xs shadow-xl shadow-accent/20">
-                    전체 {geocodedLeads.length}개 부지
+                    {geocodedLeads.map((lead) => (
+                        <CustomOverlayMap
+                            key={`overlay-${lead.id}`}
+                            position={lead.position}
+                            yAnchor={1.4}
+                        >
+                            <div
+                                className={`px-3 py-1.5 rounded-full border shadow-xl transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap
+                                    ${selectedLead?.id === lead.id
+                                        ? 'bg-accent border-white text-white scale-110 z-50'
+                                        : 'bg-[#111111]/90 backdrop-blur-md border-accent/40 text-accent hover:scale-105'}`}
+                                onClick={() => setSelectedLead(lead)}
+                            >
+                                <Building2 size={12} />
+                                <span className="text-[10px] font-bold">
+                                    {lead.project_type === 'rooftop' ? '지붕' : lead.project_type === 'ground' ? '노지' : '영농형'}
+                                    {` ${lead.desired_capacity_kw || ''}kW`}
+                                </span>
+                            </div>
+                        </CustomOverlayMap>
+                    ))}
+                </Map>
+
+                {/* Float HUD: Search Leads */}
+                <div className="absolute top-6 left-6 z-10 flex items-center gap-3">
+                    <div className="bg-[#111111]/80 backdrop-blur-md border border-white/10 px-6 py-3 rounded-[24px] flex items-center gap-3 shadow-2xl">
+                        <Search size={18} className="text-accent" />
+                        <input
+                            placeholder="지역 또는 주소 검색"
+                            className="bg-transparent border-none focus:outline-none text-sm text-white w-48 font-medium placeholder:text-white/20"
+                        />
+                    </div>
+                    <div className="bg-accent text-white px-4 py-3 rounded-[20px] font-bold text-xs shadow-xl shadow-accent/20">
+                        전체 {geocodedLeads.length}개 부지
+                    </div>
                 </div>
             </div>
 
-            {/* Detail Overlay Card */}
-            {selectedLead && (
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-md z-20 px-4 animate-in slide-in-from-bottom-8 duration-500">
-                    <div className="bg-[#111111]/95 backdrop-blur-xl border border-white/10 rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
-                        <div className="p-8">
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <div className="px-3 py-1 bg-accent/20 text-accent rounded-full text-[10px] font-bold uppercase tracking-widest">
-                                            {selectedLead.project_type === 'rooftop' ? '지붕 태양광' : selectedLead.project_type === 'ground' ? '노지 태양광' : '영농형 태양광'}
-                                        </div>
-                                        <span className="text-[10px] text-white/40 font-bold">{new Date(selectedLead.created_at).toLocaleDateString()}</span>
+            {/* Right Side: Detail Panel (1/3) */}
+            <div className="w-1/3 h-full bg-[#111111]/50 backdrop-blur-md overflow-y-auto">
+                {selectedLead ? (
+                    <div className="p-8 animate-in fade-in duration-500">
+                        <div className="flex justify-between items-start mb-8">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="px-3 py-1 bg-accent/20 text-accent rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                        {selectedLead.project_type === 'rooftop' ? '지붕 태양광' : selectedLead.project_type === 'ground' ? '노지 태양광' : '영농형 태양광'}
                                     </div>
-                                    <h3 className="text-xl font-bold text-white leading-tight">
-                                        {selectedLead.address}
-                                    </h3>
+                                    <span className="text-[10px] text-white/40 font-bold">{new Date(selectedLead.created_at).toLocaleDateString()}</span>
                                 </div>
-                                <button
-                                    onClick={() => setSelectedLead(null)}
-                                    className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/30"
-                                >
-                                    <X size={20} />
-                                </button>
+                                <h3 className="text-2xl font-bold text-white leading-tight">
+                                    {selectedLead.address}
+                                </h3>
+                                <p className="text-white/40 text-xs flex items-center gap-1">
+                                    <MapPin size={12} />
+                                    위치 상세 정보 확인 가능
+                                </p>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <DetailItem icon={<Maximize2 size={16} />} label="면적" value={`${selectedLead.area_sqm.toLocaleString()} ㎡`} />
-                                <DetailItem icon={<Zap size={16} />} label="희망 용량" value={`${selectedLead.desired_capacity_kw || '미정'} kW`} />
-                                <DetailItem icon={<Calendar size={16} />} label="준공 희망" value={`${selectedLead.desired_completion_year}년 ${selectedLead.desired_completion_half === 'H1' ? '상반기' : '하반기'}`} />
-                                <DetailItem icon={<Info size={16} />} label="예산" value={selectedLead.budget_range || '상담 후 결정'} />
-                            </div>
-
                             <button
-                                onClick={() => setIsBidModalOpen(true)}
-                                className="w-full py-5 bg-accent text-white rounded-[24px] font-extrabold flex items-center justify-center gap-3 hover:bg-orange-500 transition-all shadow-xl shadow-accent/20 group"
+                                onClick={() => setSelectedLead(null)}
+                                className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/30"
                             >
-                                <BadgeDollarSign size={20} className="group-hover:scale-110 transition-transform" />
-                                <span>이 부지에 견적 보내기</span>
+                                <X size={20} />
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
 
-            {/* Bidding Modal (Same as before) */}
+                        <div className="space-y-4 mb-10">
+                            <DetailItem icon={<Maximize2 size={16} />} label="면적" value={`${selectedLead.area_sqm.toLocaleString()} ㎡`} />
+                            <DetailItem icon={<Zap size={16} />} label="희망 용량" value={`${selectedLead.desired_capacity_kw || '미정'} kW`} />
+                            <DetailItem icon={<Calendar size={16} />} label="준공 희망" value={`${selectedLead.desired_completion_year}년 ${selectedLead.desired_completion_half === 'H1' ? '상반기' : '하반기'}`} />
+                            <DetailItem icon={<Info size={16} />} label="예산" value={selectedLead.budget_range || '상담 후 결정'} />
+                        </div>
+
+                        <div className="p-6 bg-accent/5 border border-accent/10 rounded-[32px] mb-10">
+                            <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                                <ClipboardCheck size={16} className="text-accent" />
+                                시공 검토 내용
+                            </h4>
+                            <p className="text-sm text-white/60 leading-relaxed">
+                                {selectedLead.additional_notes || "추가 메모 정보가 없습니다."}
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={() => setIsBidModalOpen(true)}
+                            className="w-full py-5 bg-accent text-white rounded-[24px] font-extrabold flex items-center justify-center gap-3 hover:bg-orange-500 transition-all shadow-xl shadow-accent/20 group"
+                        >
+                            <BadgeDollarSign size={20} className="group-hover:scale-110 transition-transform" />
+                            <span>견적 발송하기</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="h-full flex flex-col items-center justify-center p-12 text-center opacity-30">
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                            <MapPin size={32} />
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">부지를 선택해주세요</h3>
+                        <p className="text-sm text-white/60">
+                            지도 위의 마커를 클릭하면<br />
+                            해당 부지의 상세 정보를 확인할 수 있습니다.
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Bidding Modal */}
             {isBidModalOpen && selectedLead && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
                     <div className="w-full max-w-lg bg-[#111111] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
