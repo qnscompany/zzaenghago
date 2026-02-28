@@ -58,17 +58,21 @@ CREATE TABLE public.leads (
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- Bids table
 CREATE TABLE public.bids (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   lead_id UUID NOT NULL REFERENCES public.leads(id) ON DELETE CASCADE,
   company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  material_cost NUMERIC NOT NULL,
-  construction_cost NUMERIC NOT NULL,
-  warranty_years INT NOT NULL,
+  capacity_kw NUMERIC NOT NULL,
+  project_type project_type NOT NULL,
+  total_amount NUMERIC NOT NULL,
+  construction_period TEXT,
+  valid_thru DATE,
+  included_items TEXT[], -- ['module', 'inverter', 'structure', 'electric', 'civil', 'permits', 'monitoring']
+  warranty_years_construction INT,
+  warranty_years_module INT,
   as_policy TEXT,
   exclusions TEXT,
-  total_amount NUMERIC NOT NULL,
+  comment TEXT,
   status bid_status DEFAULT 'sent' NOT NULL,
   view_token UUID DEFAULT gen_random_uuid() UNIQUE NOT NULL,
   token_used BOOLEAN DEFAULT FALSE NOT NULL,

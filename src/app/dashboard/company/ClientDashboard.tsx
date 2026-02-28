@@ -16,6 +16,7 @@ import {
     AlertCircle,
     Hourglass
 } from 'lucide-react'
+import BidForm from './BidForm'
 
 export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kakaoKey: string }) {
     const [selectedLead, setSelectedLead] = useState<any>(null);
@@ -185,7 +186,7 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
                         />
                     </div>
                     <div className="bg-accent text-white px-4 py-3 rounded-[20px] font-bold text-xs shadow-xl shadow-accent/20">
-                        전체 {geocodedLeads.length}개 부지
+                        전체 {leads.length}개 (지도 {geocodedLeads.length}개)
                     </div>
                 </div>
             </div>
@@ -258,27 +259,13 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
             </div>
 
             {/* Bidding Modal */}
-            {isBidModalOpen && selectedLead && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
-                    <div className="w-full max-w-lg bg-[#111111] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
-                        <div className="p-12 text-center">
-                            <div className="p-4 bg-accent/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-8 text-accent">
-                                <ClipboardCheck size={40} />
-                            </div>
-                            <h3 className="text-2xl font-bold text-white mb-4">견적 시스템 준비 중</h3>
-                            <p className="text-white/40 mb-10 leading-relaxed">
-                                더욱 정확하고 투명한 견적 비교를 위해<br />
-                                정식 견적 시스템을 구축하고 있습니다.
-                            </p>
-                            <button
-                                onClick={() => setIsBidModalOpen(false)}
-                                className="px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition-all"
-                            >
-                                확인
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {selectedLead && (
+                <BidForm
+                    key={selectedLead.id}
+                    isOpen={isBidModalOpen}
+                    onClose={() => setIsBidModalOpen(false)}
+                    lead={selectedLead}
+                />
             )}
         </div>
     )

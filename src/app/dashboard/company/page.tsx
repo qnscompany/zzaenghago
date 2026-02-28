@@ -37,13 +37,18 @@ export default async function CompanyDashboardPage() {
         .eq('user_id', user.id)
         .single();
 
-    const { data: leads } = await supabase
+    const { data: leads, error: leadsError } = await supabase
         .from('leads')
         .select('*')
         .eq('status', 'open')
         .order('created_at', { ascending: false });
 
-    console.log(`[Dashboard] Fetched ${leads?.length || 0} open leads for user ${user.id}`);
+    console.log(`[Dashboard Debug] User ID: ${user.id}`);
+    console.log(`[Dashboard Debug] User Role (Metadata): ${user.user_metadata.role}`);
+    console.log(`[Dashboard Debug] Leads Count: ${leads?.length || 0}`);
+    if (leadsError) {
+        console.error(`[Dashboard Debug] Leads Fetch Error:`, leadsError);
+    }
     if (leads && leads.length > 0) {
         console.log(`[Dashboard] Sample lead address: ${leads[0].address}`);
     }

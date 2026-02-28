@@ -10,7 +10,6 @@ import {
     Calculator,
     ShieldCheck,
     UserIcon,
-    Briefcase,
     BadgeDollarSign,
     FileText,
     ChevronLeft,
@@ -19,6 +18,7 @@ import {
     CheckCircle2,
     Search
 } from "lucide-react";
+import ROIAnalysis from "@/components/leads/ROIAnalysis";
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
     const { id } = await params;
@@ -39,12 +39,21 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
         notFound();
     }
 
-    // Role check: Only the owner or an admin/company can view this (RLS handles this but let's be safe)
+    // Role check: Only the owner or an admin/company can view this
     if (lead.customer_id !== user.id && user.user_metadata.role === 'customer') {
         redirect('/leads');
     }
 
     const permits = lead.permits_status || {};
+
+    const { data: bids } = await supabase
+        .from('bids')
+        .select(`
+            *,
+            company:companies(*)
+        `)
+        .eq('lead_id', id)
+        .order('created_at', { ascending: false });
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-background px-4">
@@ -107,8 +116,8 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
 
                         {/* Additional Sections */}
                         <div className="p-8 bg-white/2 border border-white/5 rounded-[40px] space-y-8">
-                            <div>
-                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <div className="space-y-6">
+                                <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                     <UserIcon size={20} className="text-accent" />
                                     사업자 정보
                                 </h3>
@@ -160,22 +169,65 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
                                 </div>
                             )}
                         </div>
+
+                        {/* ROI Analysis Section */}
+                        {bids && bids.length > 0 && (
+                            <ROIAnalysis
+                                capacityKw={bids[0].capacity_kw}
+                                totalAmount={bids[0].total_amount}
+                            />
+                        )}
                     </div>
 
                     {/* Right: Bids Summary */}
                     <div className="space-y-6">
                         <div className="sticky top-24">
                             <div className="p-8 bg-white/2 border border-white/10 rounded-[40px] space-y-6">
-                                <h3 className="text-2xl font-bold text-white">받은 견적</h3>
-                                <div className="flex flex-col items-center justify-center py-12 text-center">
-                                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                                        <Search size={24} className="text-foreground/20" />
+                                <h3 className="text-2xl font-bold text-white mb-6 flex items-center justify-between">
+                                    받은 견적
+                                    <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">{bids?.length || 0}</span>
+                                </h3>
+
+                                {bids && bids.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {bids.map((bid: any) => (
+                                            <div key={bid.id} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:border-accent/50 transition-all group">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center text-accent">
+                                                        <Building2 size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-white">{bid.company?.company_name}</p>
+                                                        <p className="text-[10px] text-white/40">기초 단가 포함</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between items-end">
+                                                    <div>
+                                                        <p className="text-[10px] text-white/40 mb-1 uppercase tracking-wider">총 공사비</p>
+                                                        <p className="text-lg font-black text-white">{(bid.total_amount / 10000).toLocaleString()}만원</p>
+                                                    </div>
+                                                    <Link
+                                                        href={`/bids/${bid.view_token}`}
+                                                        className="px-4 py-2 bg-accent/10 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all"
+                                                    >
+                                                        상세 보기
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <p className="text-foreground/40 text-sm">
-                                        아직 도착한 견적이 없습니다.<br />
-                                        시공업체들이 검토 중입니다.
-                                    </p>
-                                </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                                        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                                            <Search size={24} className="text-foreground/20" />
+                                        </div>
+                                        <p className="text-foreground/40 text-sm">
+                                            아직 도착한 견적이 없습니다.<br />
+                                            시공업체들이 검토 중입니다.
+                                        </p>
+                                    </div>
+                                )}
+
                                 <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl">
                                     <div className="flex items-start gap-3">
                                         <AlertCircle size={18} className="text-orange-400 shrink-0 mt-0.5" />
@@ -218,3 +270,4 @@ function StatusBadge({ label, active }: { label: string, active: boolean }) {
         </div>
     );
 }
+
