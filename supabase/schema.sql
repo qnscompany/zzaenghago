@@ -34,10 +34,15 @@ CREATE TABLE public.leads (
   customer_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   address TEXT NOT NULL,
   area_sqm NUMERIC NOT NULL,
-  expected_capacity_kw NUMERIC NOT NULL,
+  desired_capacity_kw NUMERIC, -- renamed and optional
   project_type project_type NOT NULL,
   budget_range TEXT,
   desired_start DATE,
+  ownership_type TEXT, -- NEW: self/family
+  applicant_job_type TEXT, -- NEW: employee/business/farmer/unemployed
+  wants_financial_info BOOLEAN DEFAULT FALSE, -- NEW
+  permits_status JSONB, -- NEW: {electric: bool, development: bool, farmland: bool, other: string}
+  additional_notes TEXT, -- NEW
   status lead_status DEFAULT 'open' NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -82,52 +87,38 @@ CREATE POLICY "Companies can manage their own profile" ON public.companies
 CREATE POLICY "Customers can manage their own leads" ON public.leads
   FOR ALL USING (auth.uid() = customer_id);
 
-CREATE POLICY "Companies can view lead basic info" ON public.leads
+-- Leads RLS: Strict access
+DROP POLICY IF EXISTS "Companies can view lead basic info" ON public.leads;
+CREATE POLICY "Company and Admin can view leads" ON public.leads
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.users
-      WHERE public.users.id = auth.uid() AND public.users.role = 'company'
+      WHERE public.users.id = auth.uid() AND (public.users.role = 'company' OR public.users.role = 'admin')
     )
   );
 
--- Bids (The most specific one)
-CREATE POLICY "Customer can view bids for their leads" ON public.bids
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.leads
-      WHERE public.leads.id = public.bids.lead_id AND public.leads.customer_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Company can view their own bids" ON public.bids
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.companies
-      WHERE public.companies.id = public.bids.company_id AND public.companies.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Company can insert bids" ON public.bids
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.companies
-      WHERE public.companies.id = public.bids.company_id AND public.companies.user_id = auth.uid()
-    )
-  );
-
--- View Token Policy: Allow anyone with a valid unused token to view the bid
-CREATE POLICY "View bid via one-time token" ON public.bids
-  FOR SELECT USING (token_used = FALSE);
-
--- Function to handle user creation
+-- Function to handle user creation with robust role casting and Admin check
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.users (id, email, role)
-  VALUES (new.id, new.email, COALESCE((new.raw_user_meta_data->>'role')::user_role, 'customer'));
+  VALUES (
+    new.id,
+    new.email,
+    CASE 
+      WHEN new.email = 'qnscompany88@gmail.com' THEN 'admin'::public.user_role
+      WHEN (new.raw_user_meta_data->>'role') = 'company' THEN 'company'::public.user_role
+      WHEN (new.raw_user_meta_data->>'role') = 'admin' THEN 'admin'::public.user_role
+      ELSE 'customer'::public.user_role
+    END
+  );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Set search path for security
+ALTER FUNCTION public.handle_new_user() SET search_path = public;
+ Jonah
 
 -- Trigger on user creation
 CREATE TRIGGER on_auth_user_created
