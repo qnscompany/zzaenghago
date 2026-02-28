@@ -8,7 +8,7 @@ import {
     Settings
 } from "lucide-react";
 import Link from "next/link";
-import { submitProfileUpdate } from "./actions";
+import ProfileForm from "./ProfileForm";
 
 export default async function CompanyProfilePage() {
     const supabase = await createClient();
@@ -64,41 +64,11 @@ export default async function CompanyProfilePage() {
                             </div>
                         )}
 
-                        <form action={submitProfileUpdate} className="space-y-6">
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-white/30 uppercase tracking-wider ml-1">업체명</label>
-                                <input
-                                    name="company_name"
-                                    defaultValue={company?.company_name || ''}
-                                    readOnly={isPending}
-                                    placeholder="회사명을 입력하세요"
-                                    className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all disabled:opacity-50"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-white/30 uppercase tracking-wider ml-1">사업자 등록 번호</label>
-                                <input
-                                    name="business_number"
-                                    defaultValue={company?.business_number || ''}
-                                    readOnly={isPending}
-                                    placeholder="000-00-00000"
-                                    className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all disabled:opacity-50"
-                                />
-                            </div>
-                            <div className="pt-4">
-                                <button
-                                    type="submit"
-                                    disabled={isPending}
-                                    className="w-full py-5 bg-accent text-white rounded-2xl font-bold hover:bg-orange-500 transition-all shadow-lg shadow-accent/20 disabled:bg-white/5 disabled:text-white/20 disabled:shadow-none disabled:cursor-not-allowed group"
-                                >
-                                    <span className="group-hover:scale-105 transition-transform inline-block">수정 요청 보내기</span>
-                                </button>
-                                <p className="text-[11px] text-white/20 text-center mt-6 italic leading-relaxed">
-                                    ※ 쨍하고 플랫폼 정책에 따라 업체 정보 수정은 운영자의 승인 절차를 거칩니다.<br />
-                                    승인에는 영업일 기준 최대 24시간이 소요될 수 있습니다.
-                                </p>
-                            </div>
-                        </form>
+                        <ProfileForm
+                            companyName={company?.company_name || ''}
+                            businessNumber={company?.business_number || ''}
+                            isPending={isPending}
+                        />
                     </div>
 
                     <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[40px] flex items-start gap-5">
