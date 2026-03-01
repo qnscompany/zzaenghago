@@ -39,25 +39,46 @@ export async function updateSession(request: NextRequest) {
         !user &&
         !request.nextUrl.pathname.startsWith('/auth') &&
         request.nextUrl.pathname !== '/' &&
-        request.nextUrl.pathname !== '/about'
+        request.nextUrl.pathname !== '/about' &&
+        request.nextUrl.pathname !== '/terms' &&
+        request.nextUrl.pathname !== '/privacy'
     ) {
-        // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
         url.pathname = '/auth/login'
         return NextResponse.redirect(url)
     }
 
-    // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-    // creating a new response object with NextResponse.next() make sure to:
-    // 1. Pass the request in it, like so:
-    //    const myNewResponse = NextResponse.next({ request })
-    // 2. Copy over the cookies, like so:
-    //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-    // 3. Change the myNewResponse object to fit your needs, but avoid mutating
-    //    the cookies!
-    // 4. Finally, return myNewResponse.
-    // If this is not done, you may be causing the browser and server to go out
-    // of sync and terminate the user's session.
+    // Role-based redirection for companies
+    if (user && user.user_metadata.role === 'company') {
+        const isDashboardPath = request.nextUrl.pathname.startsWith('/dashboard/company')
+        const isPendingPath = request.nextUrl.pathname === '/company/pending'
+
+        if (isDashboardPath) {
+            const { data: company, error: companyError } = await supabase
+                .from('companies')
+                .select('match_status')
+                .eq('user_id', user.id)
+                .single()
+
+            if (companyError || !company || company.match_status !== 'approved') {
+                const url = request.nextUrl.clone()
+                url.pathname = '/company/pending'
+                return NextResponse.redirect(url)
+            }
+        } else if (isPendingPath) {
+            const { data: company } = await supabase
+                .from('companies')
+                .select('match_status')
+                .eq('user_id', user.id)
+                .single()
+
+            if (company?.match_status === 'approved') {
+                const url = request.nextUrl.clone()
+                url.pathname = '/dashboard/company'
+                return NextResponse.redirect(url)
+            }
+        }
+    }
 
     return supabaseResponse
 }

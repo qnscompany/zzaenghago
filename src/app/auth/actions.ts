@@ -33,7 +33,31 @@ export async function signup(formData: FormData) {
     const company_name = formData.get('company_name') as string
     const business_number = formData.get('business_number') as string
 
-    const { data, error } = await supabase.auth.signUp({
+    if (role === 'company') {
+        if (!business_number) {
+            redirect('/auth/signup?error=' + encodeURIComponent('사업자등록번호를 입력해주세요.'))
+        }
+
+        const { data: existingCompany, error: checkError } = await supabase
+            .from('companies')
+            .select('user_id')
+            .eq('business_number', business_number)
+            .maybeSingle()
+
+        if (checkError) {
+            redirect('/auth/signup?error=' + encodeURIComponent('사업자번호 확인 중 오류가 발생했습니다.'))
+        }
+
+        if (!existingCompany) {
+            redirect('/auth/signup?error=' + encodeURIComponent('한국에너지공단 등록 업체만 가입 가능합니다.'))
+        }
+
+        if (existingCompany.user_id) {
+            redirect('/auth/signup?error=' + encodeURIComponent('이미 가입된 사업자등록번호입니다.'))
+        }
+    }
+
+    const { data: signUpData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
