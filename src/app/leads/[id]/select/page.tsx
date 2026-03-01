@@ -54,22 +54,22 @@ export default async function BidSelectionPage({ params }: { params: Promise<{ i
     const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || "";
 
     return (
-        <main className="min-h-screen pt-24 pb-20 bg-background px-4">
-            <div className="max-w-[1600px] mx-auto">
+        <main className="min-h-screen pt-20 pb-20 bg-background px-4">
+            <div className="max-w-6xl mx-auto">
                 <Link
                     href={`/leads/${leadId}`}
-                    className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-8 group"
+                    className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-6 group text-sm"
                 >
-                    <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                    <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                     부지 상세정보로 돌아가기
                 </Link>
 
-                <div className="mb-12 space-y-4">
+                <div className="mb-8 space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
-                        <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-[10px] font-black uppercase tracking-widest">
+                        <span className="px-2 py-0.5 bg-accent/20 text-accent rounded-full text-[9px] font-black uppercase tracking-widest">
                             {lead.project_type === 'rooftop' ? '지붕형' : lead.project_type === 'ground' ? '지상형' : '영농형'}
                         </span>
-                        <h1 className="text-3xl md:text-5xl font-black text-white">{lead.address}</h1>
+                        <h1 className="text-2xl md:text-4xl font-black text-white">{lead.address}</h1>
                     </div>
                     <div className="flex items-center gap-6 text-white/40 text-sm">
                         <div className="flex items-center gap-2">

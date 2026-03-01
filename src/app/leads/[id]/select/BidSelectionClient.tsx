@@ -125,9 +125,9 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
     };
 
     return (
-        <div className="space-y-12">
+        <div className="space-y-8">
             {/* 1. Comparison Page Body */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Comparison Lists */}
                 <div className="space-y-6">
@@ -206,13 +206,13 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                 {/* Map Section */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <Navigation className="text-accent" />
+                        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                            <Navigation className="text-accent" size={20} />
                             지도로 거리 체감하기
                         </h2>
                     </div>
 
-                    <div className="w-full h-[600px] bg-white/2 border border-white/10 rounded-[48px] overflow-hidden relative shadow-2xl">
+                    <div className="w-full h-[500px] bg-white/2 border border-white/10 rounded-[40px] overflow-hidden relative shadow-2xl">
                         {loading && (
                             <div className="absolute inset-0 z-50 bg-[#0a0a0a] flex flex-col items-center justify-center gap-4">
                                 <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
@@ -311,28 +311,28 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
 
             {/* 2. Floating Action Bar (If bid selected) */}
             {selectedBid && !isConfirmModalOpen && (
-                <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-40px)] max-w-4xl animate-in slide-in-from-bottom duration-500">
-                    <div className="p-8 md:p-10 bg-accent/90 backdrop-blur-3xl rounded-[48px] border border-white/30 shadow-[0_40px_100px_rgba(255,92,0,0.4)] flex flex-col md:flex-row items-center gap-8 group">
-                        <div className="flex-1 flex items-center gap-6">
-                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-accent shadow-xl group-hover:scale-110 transition-transform">
-                                <Building2 size={36} />
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-32px)] max-w-3xl animate-in slide-in-from-bottom duration-500">
+                    <div className="p-6 md:p-8 bg-accent/90 backdrop-blur-3xl rounded-[32px] border border-white/30 shadow-[0_40px_100px_rgba(255,92,0,0.4)] flex flex-col md:flex-row items-center gap-6 group">
+                        <div className="flex-1 flex items-center gap-4">
+                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-accent shadow-xl group-hover:scale-110 transition-transform">
+                                <Building2 size={28} />
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-white/70 text-xs font-black uppercase tracking-[0.2em]">Selected Partner</p>
-                                <h4 className="text-3xl font-black text-white">{selectedBid.company?.company_name}</h4>
+                            <div className="space-y-0.5">
+                                <p className="text-white/70 text-[9px] font-black uppercase tracking-[0.2em]">Partner</p>
+                                <h4 className="text-xl md:text-2xl font-black text-white">{selectedBid.company?.company_name}</h4>
                             </div>
                         </div>
 
-                        <div className="h-12 w-px bg-white/20 hidden md:block"></div>
+                        <div className="h-10 w-px bg-white/20 hidden md:block"></div>
 
-                        <div className="text-center md:text-right space-y-1">
-                            <p className="text-white/70 text-xs font-bold">최종 공사비 예정액</p>
-                            <p className="text-3xl font-black text-white">{formatWon(selectedBid.total_amount)}</p>
+                        <div className="text-center md:text-right space-y-0.5">
+                            <p className="text-white/70 text-[10px] font-bold">최종 공사비</p>
+                            <p className="text-xl md:text-2xl font-black text-white">{formatWon(selectedBid.total_amount)}</p>
                         </div>
 
                         <Button
                             onClick={() => setIsConfirmModalOpen(true)}
-                            className="w-full md:w-auto px-10 h-20 bg-white hover:bg-white/90 text-accent rounded-3xl font-black text-xl shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.98]"
+                            className="w-full md:w-auto px-8 h-16 bg-white hover:bg-white/90 text-accent rounded-2xl font-black text-lg shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.98]"
                         >
                             이 업체 선정하기
                         </Button>
@@ -342,45 +342,44 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
 
             {/* 3. Confirm Modal */}
             <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-                <DialogContent className="bg-[#111] border-white/10 text-white rounded-[40px] max-w-lg p-12 overflow-hidden">
+                <DialogContent className="bg-[#111] border-white/10 text-white rounded-[40px] max-w-lg p-8 md:p-10 overflow-y-auto max-h-[90vh]">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
 
-                    <DialogHeader className="flex flex-col items-center text-center space-y-8 relative">
-                        <div className="w-24 h-24 bg-accent rounded-[40px] flex items-center justify-center text-white shadow-2xl shadow-accent/40 animate-pulse">
-                            <CheckCircle2 size={56} />
+                    <DialogHeader className="flex flex-col items-center text-center space-y-6 relative">
+                        <div className="w-20 h-20 bg-accent rounded-[32px] flex items-center justify-center text-white shadow-2xl shadow-accent/40 animate-pulse">
+                            <CheckCircle2 size={48} />
                         </div>
-                        <div className="space-y-3">
-                            <DialogTitle className="text-3xl font-black italic">"최종 파트너로 선정하시겠습니까?"</DialogTitle>
-                            <DialogDescription className="text-white/60 leading-relaxed text-lg">
+                        <div className="space-y-2">
+                            <DialogTitle className="text-2xl md:text-3xl font-black italic">"최종 파트너로 선정하시겠습니까?"</DialogTitle>
+                            <DialogDescription className="text-white/60 leading-relaxed text-base">
                                 <span className="text-white font-bold">{selectedBid?.company?.company_name}</span>을 최종 시공사로 선택합니다.<br />
-                                선정 즉시 업체에게 고객님의 <span className="text-accent font-bold">연락처 및 성함</span>이 공개되며,<br />
-                                공식 상담 프로세스가 시작됩니다.
+                                선정 즉시 연락처 및 성함이 공개됩니다.
                             </DialogDescription>
                         </div>
                     </DialogHeader>
 
-                    <div className="p-8 bg-white/5 rounded-[32px] space-y-4 my-10 border border-white/10">
-                        <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                            <span className="text-white/40 text-sm">최종 공사비</span>
-                            <span className="text-white text-xl font-black">{formatWon(selectedBid?.total_amount)}</span>
+                    <div className="p-6 bg-white/5 rounded-[28px] space-y-3 my-8 border border-white/10">
+                        <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                            <span className="text-white/40 text-xs">최종 공사비</span>
+                            <span className="text-white text-lg font-black">{formatWon(selectedBid?.total_amount)}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-white/40 text-sm">품질 보증</span>
-                            <span className="text-white font-black">{selectedBid?.warranty_years_construction}년 무상 보증</span>
+                            <span className="text-white/40 text-xs">품질 보증</span>
+                            <span className="text-white font-black text-sm">{selectedBid?.warranty_years_construction}년 무상 보증</span>
                         </div>
                     </div>
 
-                    <DialogFooter className="sm:justify-center gap-4 relative">
+                    <DialogFooter className="sm:justify-center gap-3 relative">
                         <Button
                             variant="outline"
                             onClick={() => setIsConfirmModalOpen(false)}
                             disabled={submitting}
-                            className="h-16 flex-1 rounded-2xl border-white/10 hover:bg-white/5 font-bold"
+                            className="h-14 flex-1 rounded-2xl border-white/10 hover:bg-white/5 font-bold text-sm"
                         >
-                            잠시만요, 더 고민할게요
+                            잠시만요
                         </Button>
                         <Button
-                            className="h-16 flex-1 bg-accent hover:bg-orange-600 rounded-2xl font-black text-white shadow-xl shadow-accent/20"
+                            className="h-14 flex-1 bg-accent hover:bg-orange-600 rounded-2xl font-black text-white shadow-xl shadow-accent/20 text-sm"
                             onClick={handleSelectBid}
                             disabled={submitting}
                         >
