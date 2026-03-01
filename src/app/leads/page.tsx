@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { createAdminClient } from "@/utils/supabase/admin";
 import Link from "next/link";
 import {
     PlusCircle,
@@ -24,7 +25,8 @@ export default async function LeadsPage() {
     }
 
     // Role check: Only customers can see their leads
-    if (user.user_metadata.role !== 'customer') {
+    const userRole = user.user_metadata.role;
+    if (userRole !== 'customer' && userRole !== 'admin') {
         redirect('/');
     }
 
@@ -33,6 +35,24 @@ export default async function LeadsPage() {
         .select('*')
         .eq('customer_id', user.id)
         .order('created_at', { ascending: false });
+
+    // Fetch bid counts using admin client to ensure accuracy if available
+    const adminSupabase = createAdminClient();
+    const bidCountingClient = adminSupabase || supabase;
+    const { data: allBids } = await bidCountingClient
+        .from('bids')
+        .select('lead_id');
+
+    // Count bids per lead
+    const bidCountsMap: Record<string, number> = {};
+    allBids?.forEach(b => {
+        bidCountsMap[b.lead_id] = (bidCountsMap[b.lead_id] || 0) + 1;
+    });
+
+    const enhancedLeads = leads?.map(lead => ({
+        ...lead,
+        bid_count: bidCountsMap[lead.id] || 0
+    })) || [];
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-background px-4">
@@ -54,9 +74,9 @@ export default async function LeadsPage() {
                 </div>
 
                 {/* Leads List */}
-                {leads && leads.length > 0 ? (
+                {enhancedLeads && enhancedLeads.length > 0 ? (
                     <div className="grid gap-6">
-                        {leads.map((lead) => (
+                        {enhancedLeads.map((lead: any) => (
                             <Link
                                 href={`/leads/${lead.id}`}
                                 key={lead.id}
@@ -107,8 +127,10 @@ export default async function LeadsPage() {
                                     <div className="flex items-center gap-4 shrink-0 w-full md:w-auto">
                                         <div className="flex-1 md:flex-none text-right">
                                             <div className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
-                                            <div className={`text-lg font-bold ${lead.status === 'open' ? 'text-green-400' : 'text-accent'}`}>
-                                                {lead.status === 'open' ? '견적 대기중' : lead.status === 'in_progress' ? '상담 중' : '계약 완료'}
+                                            <div className={`text-lg font-bold ${lead.status === 'open' ? (lead.bid_count > 0 ? 'text-accent' : 'text-green-400') : 'text-accent'}`}>
+                                                {lead.status === 'open'
+                                                    ? (lead.bid_count > 0 ? `견적 ${lead.bid_count}개 검토 요청` : '견적 대기중')
+                                                    : lead.status === 'in_progress' ? '상담 중' : '계약 완료'}
                                             </div>
                                         </div>
                                         <div className="p-4 bg-white/5 rounded-2xl group-hover:bg-accent group-hover:text-white transition-all">
