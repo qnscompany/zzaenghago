@@ -99,13 +99,29 @@ CREATE POLICY "Anyone can view verified companies" ON public.companies
 CREATE POLICY "Companies can manage their own profile" ON public.companies
   FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Public view company info via bid" ON public.companies
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.bids
-      WHERE public.bids.company_id = companies.id AND public.bids.view_token IS NOT NULL
-    )
+-- SECURITY DEFINER functions to bypass RLS in policies safely
+CREATE OR REPLACE FUNCTION public.has_public_bid_company(comp_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.bids
+    WHERE company_id = comp_id AND view_token IS NOT NULL
   );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.has_public_bid_lead(l_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.bids
+    WHERE lead_id = l_id AND view_token IS NOT NULL
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE POLICY "Public view company info via bid" ON public.companies
+  FOR SELECT USING (public.has_public_bid_company(id));
 
 -- Leads
 CREATE POLICY "Customers can manage their own leads" ON public.leads
@@ -135,12 +151,7 @@ CREATE POLICY "Companies can manage their own bids" ON public.bids
 -- For now, let's keep it simple: allow viewing lead if linked to a bid.
 -- More robust policy:
 CREATE POLICY "Public can view lead info via bid token" ON public.leads
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.bids
-      WHERE public.bids.lead_id = leads.id AND public.bids.view_token IS NOT NULL
-    )
-  );
+  FOR SELECT USING (public.has_public_bid_lead(id));
 
 -- Function to handle user creation with robust role casting and Admin check
 CREATE OR REPLACE FUNCTION public.handle_new_user()
