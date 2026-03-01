@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Role-based redirection for companies
-    if (user && user.user_metadata.role === 'company') {
+    if (user && user.user_metadata.role === 'company' && user.email !== 'qnscompany88@gmail.com') {
         const isDashboardPath = request.nextUrl.pathname.startsWith('/dashboard/company')
         const isPendingPath = request.nextUrl.pathname === '/company/pending'
 
