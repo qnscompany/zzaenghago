@@ -153,11 +153,12 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                                     className={`p-6 bg-[#111] border rounded-[32px] cursor-pointer transition-all hover:scale-[1.02] group relative overflow-hidden
                                         ${selectedBid?.id === bid.id ? 'border-accent ring-1 ring-accent/50 shadow-2xl shadow-accent/20' : 'border-white/10 hover:border-white/20'}`}
                                 >
-                                    {selectedBid?.id === bid.id && (
-                                        <div className="absolute top-4 right-4 bg-accent p-1.5 rounded-full text-white">
-                                            <Check size={16} />
-                                        </div>
-                                    )}
+                                    <div className={`absolute top-6 right-6 w-6 h-6 rounded-full border transition-all flex items-center justify-center
+                                            ${selectedBid?.id === bid.id
+                                            ? 'bg-accent border-accent text-white shadow-lg shadow-accent/40 scale-110'
+                                            : 'bg-white/5 border-white/10 text-white/10'}`}>
+                                        <Check size={14} strokeWidth={4} />
+                                    </div>
 
                                     <div className="flex items-start gap-4 mb-6">
                                         <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-accent group-hover:bg-accent/10 transition-colors">
