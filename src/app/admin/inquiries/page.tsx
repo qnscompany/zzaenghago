@@ -1,15 +1,12 @@
-import { createClient } from '@/utils/supabase/server';
+import { getAdminStatus } from '@/utils/auth';
 import { redirect } from 'next/navigation';
 import { getInquiries } from './actions';
 import InquiriesClient from './InquiriesClient';
 import { MessageSquare } from 'lucide-react';
 
 export default async function AdminInquiriesPage() {
-    const supabase = await createClient();
-
-    // Check admin authorization
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata.role !== 'admin') {
+    const { isAdmin } = await getAdminStatus();
+    if (!isAdmin) {
         redirect('/');
     }
 

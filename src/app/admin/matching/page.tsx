@@ -1,18 +1,18 @@
-import { createClient } from '@/utils/supabase/server';
+import { getAdminStatus } from '@/utils/auth';
 import { redirect } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
 import { GitMerge, Clock, CheckCircle2, Building2, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { cn } from '@/utils/cn';
 
 export default async function AdminMatchingFlowPage() {
-    const supabase = await createClient();
-
-    // Check admin authorization
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata.role !== 'admin') {
+    const { isAdmin } = await getAdminStatus();
+    if (!isAdmin) {
         redirect('/');
     }
+
+    const supabase = await createClient();
 
     // Fetch leads with their bids and matched company
     const { data: leads, error } = await supabase

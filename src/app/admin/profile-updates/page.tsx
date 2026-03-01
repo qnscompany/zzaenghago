@@ -1,15 +1,12 @@
-import { createClient } from '@/utils/supabase/server';
+import { getAdminStatus } from '@/utils/auth';
 import { redirect } from 'next/navigation';
 import { getProfileUpdates } from './actions';
 import ProfileUpdatesClient from './ProfileUpdatesClient';
 import { UserCog } from 'lucide-react';
 
 export default async function AdminProfileUpdatesPage() {
-    const supabase = await createClient();
-
-    // Check admin authorization
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata.role !== 'admin') {
+    const { isAdmin } = await getAdminStatus();
+    if (!isAdmin) {
         redirect('/');
     }
 
