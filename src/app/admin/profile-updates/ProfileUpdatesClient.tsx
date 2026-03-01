@@ -9,7 +9,8 @@ import {
     ArrowRight,
     ChevronDown,
     ChevronUp,
-    AlertCircle
+    AlertCircle,
+    UserCog
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
