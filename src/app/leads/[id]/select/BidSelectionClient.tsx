@@ -301,18 +301,18 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                             )}
                         </Map>
 
-                        <div className="absolute bottom-10 left-10 right-10 z-10">
-                            <div className="p-6 bg-[#111111]/80 backdrop-blur-xl border border-white/10 rounded-[32px] flex items-center gap-6 shadow-2xl">
-                                <div className="p-3 bg-accent/20 rounded-2xl text-accent">
-                                    <Navigation size={24} />
+                        <div className="absolute top-6 left-6 right-6 z-10">
+                            <div className="p-4 bg-[#111111]/80 backdrop-blur-xl border border-white/10 rounded-[24px] flex items-center gap-4 shadow-2xl">
+                                <div className="p-2 bg-accent/20 rounded-xl text-accent">
+                                    <Navigation size={18} />
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">거리 확인</p>
-                                    <p className="text-white font-bold leading-none text-sm md:text-base">
+                                <div className="space-y-0.5">
+                                    <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">거리 확인</p>
+                                    <p className="text-white font-bold leading-none text-xs md:text-sm">
                                         {selectedBid && selectedBid.position && leadPosition ? (
                                             <>시공사와 내 부지 사이의 본사 직선 거리는 약 <span className="text-accent underline font-black">{calculateDistance(leadPosition, selectedBid.position)}km</span> 입니다.</>
                                         ) : (
-                                            <>업체 또는 마커를 선택하면 거리가 표시됩니다.</>
+                                            <>업체 또는 마커를 선택하면 직선 거리가 표시됩니다.</>
                                         )}
                                     </p>
                                 </div>
@@ -333,6 +333,9 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                             <div className="space-y-0.5">
                                 <p className="text-white/70 text-[9px] font-black uppercase tracking-[0.2em]">Partner</p>
                                 <h4 className="text-xl md:text-2xl font-black text-white">{selectedBid.company?.company_name}</h4>
+                                {selectedBid.position && leadPosition && (
+                                    <p className="text-white/40 text-[10px] font-bold">부지와의 거리: <span className="text-white">{calculateDistance(leadPosition, selectedBid.position)}km</span></p>
+                                )}
                             </div>
                         </div>
 
