@@ -321,14 +321,22 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
                 </div>
             </div>
         );
-    } catch (e) {
+    } catch (e: any) {
+        // Handle Next.js internal errors (notFound, redirect) correctly
+        if (e?.message === 'NEXT_NOT_FOUND' || e?.digest?.includes('NEXT_NOT_FOUND')) throw e;
+        if (e?.message?.includes('NEXT_REDIRECT') || e?.digest?.includes('NEXT_REDIRECT')) throw e;
+
         console.error("Critical Page Error:", e);
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-background p-10 text-center space-y-6">
                 <AlertCircle size={48} className="text-red-500" />
                 <h1 className="text-2xl font-bold text-white">견적 정보를 불러오는 중 오류가 발생했습니다.</h1>
+                <div className="p-6 bg-white/5 rounded-2xl border border-white/10 text-left max-w-2xl w-full">
+                    <p className="text-xs font-mono text-white/40 mb-2 uppercase tracking-widest">Detail Log</p>
+                    <p className="text-sm text-red-400 font-mono break-all">{e?.message || "Unknown Runtime Error"}</p>
+                </div>
                 <p className="text-white/40 max-w-md">화면을 새로고침하거나 잠시 후 다시 시도해 주세요. 문제가 지속되면 관리자에게 문의 바랍니다.</p>
-                <Link href="/" className="px-8 py-4 bg-white/5 text-white rounded-2xl hover:bg-white/10 transition-all">
+                <Link href="/" className="px-8 py-4 bg-white/5 text-white rounded-2xl hover:bg-white/10 transition-all font-bold">
                     홈으로 이동
                 </Link>
             </div>
