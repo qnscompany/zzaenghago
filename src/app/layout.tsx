@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function RootLayout({
@@ -28,6 +29,7 @@ export default async function RootLayout({
       <body className="antialiased font-sans">
         <Navbar initialUser={user} />
         {children}
+        <Footer />
       </body>
     </html>
   );
