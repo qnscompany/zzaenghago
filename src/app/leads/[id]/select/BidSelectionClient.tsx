@@ -149,7 +149,7 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                             bids.map((bid) => (
                                 <div
                                     key={bid.id}
-                                    onClick={() => setSelectedBid(bid)}
+                                    onClick={() => setSelectedBid((prev: BidWithCompany | null) => prev?.id === bid.id ? null : bid)}
                                     className={`p-6 bg-[#111] border rounded-[32px] cursor-pointer transition-all hover:scale-[1.02] group relative overflow-hidden
                                         ${selectedBid?.id === bid.id ? 'border-accent ring-1 ring-accent/50 shadow-2xl shadow-accent/20' : 'border-white/10 hover:border-white/20'}`}
                                 >
@@ -241,7 +241,7 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                                 <MapMarker
                                     key={bid.id}
                                     position={bid.position}
-                                    onClick={() => setSelectedBid(bid)}
+                                    onClick={() => setSelectedBid((prev: BidWithCompany | null) => prev?.id === bid.id ? null : bid)}
                                 />
                             ))}
 
@@ -253,7 +253,7 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                                     yAnchor={1.4}
                                 >
                                     <div
-                                        onClick={() => setSelectedBid(bid)}
+                                        onClick={() => setSelectedBid((prev: BidWithCompany | null) => prev?.id === bid.id ? null : bid)}
                                         className={`px-4 py-2 rounded-full border shadow-xl transition-all cursor-pointer whitespace-nowrap font-bold text-xs
                                             ${selectedBid?.id === bid.id
                                                 ? 'bg-accent border-white text-white scale-110 z-50'
@@ -310,7 +310,7 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
             </div>
 
             {/* 2. Floating Action Bar (If bid selected) */}
-            {selectedBid && (
+            {selectedBid && !isConfirmModalOpen && (
                 <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-40px)] max-w-4xl animate-in slide-in-from-bottom duration-500">
                     <div className="p-8 md:p-10 bg-accent/90 backdrop-blur-3xl rounded-[48px] border border-white/30 shadow-[0_40px_100px_rgba(255,92,0,0.4)] flex flex-col md:flex-row items-center gap-8 group">
                         <div className="flex-1 flex items-center gap-6">

@@ -297,19 +297,7 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
                                         <InfoRow label="보유 기술자" value={company.technician_count || '정보 미등록'} />
                                     </div>
 
-                                    {bid.comment && (
-                                        <div className="pt-8 border-t border-white/5">
-                                            <h5 className="text-sm font-bold text-white mb-3">업체 한마디</h5>
-                                            <div className="p-6 bg-accent/5 border border-accent/20 rounded-3xl text-sm italic text-white/80 leading-relaxed">
-                                                "{bid.comment}"
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <button className="w-full py-6 bg-accent hover:bg-orange-500 text-white font-black rounded-[24px] shadow-2xl shadow-accent/20 transition-all flex items-center justify-center gap-3">
-                                        <Zap size={20} />
-                                        이 업체와 상담하기
-                                    </button>
+                                    {/* Consultation button removed per user request */}
                                 </div>
                             </div>
                         </div>
