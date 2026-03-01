@@ -111,34 +111,35 @@ export default async function AdminDashboardPage() {
             </div>
         </div>
     );
+}
 
-    function StatCard({ title, value, icon, description }: { title: string, value: number, icon: React.ReactNode, description: string }) {
-        return (
-            <div className="bg-slate-900/50 border border-white/5 p-6 rounded-[32px] hover:border-blue-500/30 transition-all group">
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-blue-500/10 rounded-2xl group-hover:scale-110 transition-transform">
-                        {icon}
-                    </div>
-                    <h3 className="font-bold text-slate-400 group-hover:text-white transition-colors uppercase tracking-tight text-xs">{title}</h3>
+function StatCard({ title, value, icon, description }: { title: string, value: number, icon: React.ReactNode, description: string }) {
+    return (
+        <div className="bg-slate-900/50 border border-white/5 p-6 rounded-[32px] hover:border-blue-500/30 transition-all group">
+            <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-blue-500/10 rounded-2xl group-hover:scale-110 transition-transform">
+                    {icon}
                 </div>
-                <div className="flex items-end justify-between">
-                    <p className="text-4xl font-extrabold font-outfit text-white">{value}</p>
-                    <span className="text-[10px] text-slate-500 font-bold mb-1">{description}</span>
-                </div>
+                <h3 className="font-bold text-slate-400 group-hover:text-white transition-colors uppercase tracking-tight text-xs">{title}</h3>
             </div>
-        );
-    }
+            <div className="flex items-end justify-between">
+                <p className="text-4xl font-extrabold font-outfit text-white">{value}</p>
+                <span className="text-[10px] text-slate-500 font-bold mb-1">{description}</span>
+            </div>
+        </div>
+    );
+}
 
-    function StatusRow({ label, status }: { label: string, status: 'healthy' | 'error' | 'warning' }) {
-        return (
-            <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                <span className="text-sm text-slate-400">{label}</span>
-                <div className="flex items-center gap-2">
-                    {status === 'healthy' && <CheckCircle2 size={14} className="text-green-500" />}
-                    {status === 'warning' && <Clock size={14} className="text-yellow-500" />}
-                    {status === 'error' && <XCircle size={14} className="text-red-500" />}
-                    <span className="text-xs font-bold uppercase tracking-widest opacity-50">{status}</span>
-                </div>
+function StatusRow({ label, status }: { label: string, status: 'healthy' | 'error' | 'warning' }) {
+    return (
+        <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+            <span className="text-sm text-slate-400">{label}</span>
+            <div className="flex items-center gap-2">
+                {status === 'healthy' && <CheckCircle2 size={14} className="text-green-500" />}
+                {status === 'warning' && <Clock size={14} className="text-yellow-500" />}
+                {status === 'error' && <XCircle size={14} className="text-red-500" />}
+                <span className="text-xs font-bold uppercase tracking-widest opacity-50">{status}</span>
             </div>
-        );
-    }
+        </div>
+    );
+}
