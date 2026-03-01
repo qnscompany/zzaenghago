@@ -124,6 +124,18 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
         return Math.floor(val / 10000).toLocaleString() + '만원';
     };
 
+    const calculateDistance = (p1: { lat: number, lng: number }, p2: { lat: number, lng: number }) => {
+        const R = 6371; // Earth's radius in km
+        const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+        const dLng = (p2.lng - p1.lng) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return (R * c).toFixed(1);
+    };
+
     return (
         <div className="space-y-8">
             {/* 1. Comparison Page Body */}
@@ -296,9 +308,9 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">거리 확인</p>
-                                    <p className="text-white font-bold leading-none">
-                                        {selectedBid ? (
-                                            <>시공사와 내 부지 사이의 <span className="text-accent underline">본사 직선 거리</span>를 확인하세요.</>
+                                    <p className="text-white font-bold leading-none text-sm md:text-base">
+                                        {selectedBid && selectedBid.position && leadPosition ? (
+                                            <>시공사와 내 부지 사이의 본사 직선 거리는 약 <span className="text-accent underline font-black">{calculateDistance(leadPosition, selectedBid.position)}km</span> 입니다.</>
                                         ) : (
                                             <>업체 또는 마커를 선택하면 거리가 표시됩니다.</>
                                         )}
