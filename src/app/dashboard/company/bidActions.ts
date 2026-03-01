@@ -62,28 +62,35 @@ export async function submitBid(prevState: BidActionState, formData: FormData): 
         return { error: '이미 견적을 발송한 고객입니다.' };
     }
 
-    const { error } = await supabase
-        .from('bids')
-        .insert({
-            lead_id,
-            company_id: company.id,
-            capacity_kw,
-            project_type,
-            total_amount,
-            construction_period,
-            valid_thru: valid_thru || null,
-            included_items,
-            warranty_years_construction,
-            warranty_years_module,
-            as_policy,
-            exclusions,
-            comment,
-            status: 'sent'
+    // Use RPC for atomic transaction: Insert Bid + Deduct Credit + Update Lead Count
+    const { data: bidId, error: rpcError } = await supabase
+        .rpc('send_bid_with_credits', {
+            p_lead_id: lead_id,
+            p_company_id: company.id,
+            p_capacity_kw: capacity_kw,
+            p_project_type: project_type,
+            p_total_amount: total_amount,
+            p_construction_period: construction_period,
+            p_valid_thru: valid_thru || null,
+            p_included_items: included_items,
+            p_warranty_years_construction: warranty_years_construction,
+            p_warranty_years_module: warranty_years_module,
+            p_as_policy: as_policy,
+            p_exclusions: exclusions,
+            p_comment: comment
         });
 
-    if (error) {
-        console.error('Error submitting bid:', error);
-        return { error: '견적 제출 중 오류가 발생했습니다.' };
+    if (rpcError) {
+        console.error('Error in send_bid_with_credits:', rpcError);
+
+        if (rpcError.message.includes('INSUFFICIENT_CREDITS')) {
+            return { error: 'CREDIT_LACK' };
+        }
+        if (rpcError.message.includes('LEAD_CLOSED')) {
+            return { error: '이미 5개의 견적이 모두 도착하여 마감된 부지입니다.' };
+        }
+
+        return { error: '견적 제출 중 오류가 발생했습니다. (' + rpcError.message + ')' };
     }
 
     revalidatePath('/dashboard/company');

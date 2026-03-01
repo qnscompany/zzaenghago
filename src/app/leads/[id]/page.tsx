@@ -239,6 +239,16 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                                     </div>
                                 )}
 
+                                {bids && bids.length > 0 && (
+                                    <Link
+                                        href={`/leads/${id}/select`}
+                                        className="w-full py-5 bg-accent text-white rounded-[24px] font-extrabold flex items-center justify-center gap-3 hover:bg-orange-500 transition-all shadow-xl shadow-accent/20 group"
+                                    >
+                                        <BadgeDollarSign size={20} className="group-hover:scale-110 transition-transform" />
+                                        <span>견적 비교 및 업체 선정하기</span>
+                                    </Link>
+                                )}
+
                                 <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl">
                                     <div className="flex items-start gap-3">
                                         <AlertCircle size={18} className="text-orange-400 shrink-0 mt-0.5" />

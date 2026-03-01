@@ -13,16 +13,24 @@ export default async function BidCreatePage({ params }: { params: Promise<{ id: 
         redirect('/auth/login');
     }
 
-    // Check if company exists
-    const { data: company } = await supabase
+    // Check if company exists and get credits
+    const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .select('id, company_name')
+        .select(`
+            id, 
+            company_name,
+            credits:credits(balance)
+        `)
         .eq('user_id', user.id)
         .single();
 
-    if (!company) {
+    const company = companyData as any;
+
+    if (companyError || !company) {
         redirect('/dashboard/company/profile');
     }
+
+    const creditBalance = company.credits?.[0]?.balance ?? 0;
 
     // Check if bid already exists (to prevent duplicate page entry)
     const { data: existingBid } = await supabase
@@ -113,7 +121,7 @@ export default async function BidCreatePage({ params }: { params: Promise<{ id: 
                                 </div>
                             </div>
 
-                            <BidFormPageClient lead={lead} company={company} />
+                            <BidFormPageClient lead={lead} company={company} creditBalance={creditBalance} />
                         </div>
                     </div>
                 </div>

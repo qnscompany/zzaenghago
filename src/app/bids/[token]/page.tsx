@@ -92,11 +92,7 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
             <div className="pt-24 pb-20 min-h-screen bg-background px-4">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header / Back Link */}
-                    <div className="flex items-center justify-between mb-12">
-                        <Link href="/" className="flex items-center gap-2 text-accent font-bold text-xl font-outfit">
-                            <Sun className="fill-accent" />
-                            <span>쨍하고</span>
-                        </Link>
+                    <div className="flex items-center justify-end mb-12">
                         <Link href="/leads" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors text-sm font-bold">
                             <ArrowLeft size={16} />
                             내 부지 목록으로

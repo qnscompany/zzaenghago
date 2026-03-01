@@ -55,8 +55,38 @@ CREATE TABLE public.leads (
   permits_status JSONB, -- NEW: {electric: bool, development: bool, farmland: bool, other: string}
   additional_notes TEXT, -- NEW
   status lead_status DEFAULT 'open' NOT NULL,
+  bid_count INT DEFAULT 0, -- NEW: count of received bids
+  matched_at TIMESTAMPTZ, -- NEW: when a company was selected
+  reset_available_at TIMESTAMPTZ, -- NEW: when re-bidding is allowed
+  customer_name TEXT, -- NEW: link to users or dedicated field
+  customer_phone TEXT, -- NEW: link to users or dedicated field
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
+
+-- Function to select a bid atomically
+CREATE OR REPLACE FUNCTION select_bid(
+    p_lead_id UUID,
+    p_bid_id UUID
+) RETURNS VOID AS $$
+BEGIN
+    -- 1. Update Lead status and matched_at
+    UPDATE leads
+    SET matched_at = NOW(),
+        status = 'contract_pending'
+    WHERE id = p_lead_id;
+
+    -- 2. Update the selected bid
+    UPDATE bids
+    SET is_selected = true,
+        customer_info_unlocked = true
+    WHERE id = p_bid_id AND lead_id = p_lead_id;
+
+    -- 3. (Optional) Deselect other bids for the same lead (defensive)
+    UPDATE bids
+    SET is_selected = false
+    WHERE lead_id = p_lead_id AND id <> p_bid_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TABLE public.bids (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -77,6 +107,8 @@ CREATE TABLE public.bids (
   view_token UUID DEFAULT gen_random_uuid() UNIQUE NOT NULL,
   UNIQUE(lead_id, company_id),
   token_used BOOLEAN DEFAULT FALSE NOT NULL,
+  is_selected BOOLEAN DEFAULT FALSE NOT NULL, -- NEW: true if customer selects this bid
+  customer_info_unlocked BOOLEAN DEFAULT FALSE NOT NULL, -- NEW: unlocked for the winner
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
@@ -237,3 +269,121 @@ CREATE POLICY "Admins can view and manage all updates" ON public.profile_updates
       WHERE public.users.id = auth.uid() AND public.users.role = 'admin'
     )
   );
+
+-- Credits tables
+CREATE TABLE public.credits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE UNIQUE,
+  balance INT DEFAULT 3 NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE TABLE public.credit_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  change_amount INT NOT NULL,
+  reason TEXT NOT NULL,
+  bid_id UUID REFERENCES public.bids(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.credits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.credit_history ENABLE ROW LEVEL SECURITY;
+
+-- NEW RLS Policies for Credits
+CREATE POLICY "Companies can view their own credits" ON public.credits
+  FOR SELECT USING (EXISTS (
+    SELECT 1 FROM public.companies 
+    WHERE public.companies.id = credits.company_id AND public.companies.user_id = auth.uid()
+  ));
+
+CREATE POLICY "Companies can view their own credit history" ON public.credit_history
+  FOR SELECT USING (EXISTS (
+    SELECT 1 FROM public.companies 
+    WHERE public.companies.id = credit_history.company_id AND public.companies.user_id = auth.uid()
+  ));
+
+-- RLS: Only selected company can view customer info in leads
+CREATE POLICY "Selected companies can view customer info" ON public.leads
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.bids
+      WHERE public.bids.lead_id = leads.id 
+      AND public.bids.company_id = (SELECT id FROM public.companies WHERE user_id = auth.uid())
+      AND public.bids.customer_info_unlocked = true
+    )
+  );
+
+-- Automation for new companies
+CREATE OR REPLACE FUNCTION public.handle_new_company_credits()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.credits (company_id, balance)
+  VALUES (new.id, 3) ON CONFLICT (company_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_company_created_add_credits
+  AFTER INSERT ON public.companies
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_company_credits();
+
+-- RPC: Send Bid with Credits (Atomic)
+CREATE OR REPLACE FUNCTION public.send_bid_with_credits(
+    p_lead_id UUID,
+    p_company_id UUID,
+    p_capacity_kw NUMERIC,
+    p_project_type project_type,
+    p_total_amount NUMERIC,
+    p_construction_period TEXT DEFAULT NULL,
+    p_valid_thru DATE DEFAULT NULL,
+    p_included_items TEXT[] DEFAULT NULL,
+    p_warranty_years_construction INT DEFAULT NULL,
+    p_warranty_years_module INT DEFAULT NULL,
+    p_as_policy TEXT DEFAULT NULL,
+    p_exclusions TEXT DEFAULT NULL,
+    p_comment TEXT DEFAULT NULL
+) RETURNS UUID AS $$
+DECLARE
+    v_balance INT;
+    v_bid_count INT;
+    v_bid_id UUID;
+BEGIN
+    -- 1. Check Credit Balance
+    SELECT balance INTO v_balance FROM public.credits WHERE company_id = p_company_id FOR UPDATE;
+    IF v_balance < 1 THEN
+        RAISE EXCEPTION 'INSUFFICIENT_CREDITS';
+    END IF;
+
+    -- 2. Check Lead Bid Count
+    SELECT bid_count INTO v_bid_count FROM public.leads WHERE id = p_lead_id FOR UPDATE;
+    IF v_bid_count >= 5 THEN
+        RAISE EXCEPTION 'LEAD_CLOSED';
+    END IF;
+
+    -- 3. Insert Bid
+    INSERT INTO public.bids (
+        lead_id, company_id, capacity_kw, project_type, total_amount,
+        construction_period, valid_thru, included_items,
+        warranty_years_construction, warranty_years_module,
+        as_policy, exclusions, comment
+    ) VALUES (
+        p_lead_id, p_company_id, p_capacity_kw, p_project_type, p_total_amount,
+        p_construction_period, p_valid_thru, p_included_items,
+        p_warranty_years_construction, p_warranty_years_module,
+        p_as_policy, p_exclusions, p_comment
+    ) RETURNING id INTO v_bid_id;
+
+    -- 4. Deduct Credit
+    UPDATE public.credits SET balance = balance - 1, updated_at = NOW() WHERE company_id = p_company_id;
+
+    -- 5. Add History
+    INSERT INTO public.credit_history (company_id, change_amount, reason, bid_id)
+    VALUES (p_company_id, -1, '견적 발송', v_bid_id);
+
+    -- 6. Update Lead Count
+    UPDATE public.leads SET bid_count = bid_count + 1 WHERE id = p_lead_id;
+
+    RETURN v_bid_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
