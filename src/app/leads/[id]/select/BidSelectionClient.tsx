@@ -342,44 +342,44 @@ export default function BidSelectionClient({ lead, bids, kakaoKey }: { lead: any
 
             {/* 3. Confirm Modal */}
             <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-                <DialogContent className="bg-[#111] border-white/10 text-white rounded-[40px] max-w-lg p-8 md:p-10 overflow-y-auto max-h-[90vh]">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
+                <DialogContent className="bg-[#111] border-white/10 text-white rounded-[32px] max-w-md p-6 md:p-8 overflow-hidden">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-accent/5 blur-[80px] -mr-24 -mt-24 rounded-full"></div>
 
-                    <DialogHeader className="flex flex-col items-center text-center space-y-6 relative">
-                        <div className="w-20 h-20 bg-accent rounded-[32px] flex items-center justify-center text-white shadow-2xl shadow-accent/40 animate-pulse">
-                            <CheckCircle2 size={48} />
+                    <DialogHeader className="flex flex-col items-center text-center space-y-4 relative">
+                        <div className="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center text-white shadow-xl shadow-accent/40 animate-pulse">
+                            <CheckCircle2 size={32} />
                         </div>
-                        <div className="space-y-2">
-                            <DialogTitle className="text-2xl md:text-3xl font-black italic">"최종 파트너로 선정하시겠습니까?"</DialogTitle>
-                            <DialogDescription className="text-white/60 leading-relaxed text-base">
+                        <div className="space-y-1">
+                            <DialogTitle className="text-xl md:text-2xl font-black italic tracking-tight">"최종 파트너로 선정하시겠습니까?"</DialogTitle>
+                            <DialogDescription className="text-white/60 leading-relaxed text-xs">
                                 <span className="text-white font-bold">{selectedBid?.company?.company_name}</span>을 최종 시공사로 선택합니다.<br />
                                 선정 즉시 연락처 및 성함이 공개됩니다.
                             </DialogDescription>
                         </div>
                     </DialogHeader>
 
-                    <div className="p-6 bg-white/5 rounded-[28px] space-y-3 my-8 border border-white/10">
-                        <div className="flex justify-between items-center pb-3 border-b border-white/5">
-                            <span className="text-white/40 text-xs">최종 공사비</span>
-                            <span className="text-white text-lg font-black">{formatWon(selectedBid?.total_amount)}</span>
+                    <div className="p-4 bg-white/5 rounded-[20px] space-y-2 my-6 border border-white/10">
+                        <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                            <span className="text-white/30 text-[10px] font-bold uppercase tracking-widest">최종 공사비</span>
+                            <span className="text-accent text-base font-black">{formatWon(selectedBid?.total_amount)}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-white/40 text-xs">품질 보증</span>
-                            <span className="text-white font-black text-sm">{selectedBid?.warranty_years_construction}년 무상 보증</span>
+                            <span className="text-white/30 text-[10px] font-bold uppercase tracking-widest">품질 보증</span>
+                            <span className="text-white font-black text-xs">{selectedBid?.warranty_years_construction}년 무상 보증</span>
                         </div>
                     </div>
 
-                    <DialogFooter className="sm:justify-center gap-3 relative">
+                    <DialogFooter className="sm:justify-center gap-2 relative">
                         <Button
                             variant="outline"
                             onClick={() => setIsConfirmModalOpen(false)}
                             disabled={submitting}
-                            className="h-14 flex-1 rounded-2xl border-white/10 hover:bg-white/5 font-bold text-sm"
+                            className="h-12 flex-1 rounded-xl border-white/10 hover:bg-white/5 font-bold text-xs"
                         >
                             잠시만요
                         </Button>
                         <Button
-                            className="h-14 flex-1 bg-accent hover:bg-orange-600 rounded-2xl font-black text-white shadow-xl shadow-accent/20 text-sm"
+                            className="h-12 flex-1 bg-accent hover:bg-orange-600 rounded-xl font-black text-white shadow-lg shadow-accent/20 text-xs"
                             onClick={handleSelectBid}
                             disabled={submitting}
                         >
