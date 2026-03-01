@@ -6,27 +6,28 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { signOut } from "@/app/auth/actions";
 
-export default function Navbar() {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+export default function Navbar({ initialUser }: { initialUser?: any }) {
+    const [user, setUser] = useState<any>(initialUser);
+    const [loading, setLoading] = useState(!initialUser);
     const supabase = createClient();
 
     useEffect(() => {
         const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
+            if (!initialUser) {
+                const { data: { session } } = await supabase.auth.getSession();
+                setUser(session?.user ?? null);
+            }
             setLoading(false);
         };
         checkAuth();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
-            setLoading(true); // Reset loading to force recalculation if needed, or keep false if session is enough
             setLoading(false);
         });
 
         return () => subscription.unsubscribe();
-    }, [supabase.auth]);
+    }, [supabase.auth, initialUser]);
 
     return (
         <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/10">

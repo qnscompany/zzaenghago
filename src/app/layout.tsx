@@ -13,16 +13,20 @@ export const metadata: Metadata = {
 };
 
 import Navbar from "@/components/Navbar";
+import { createClient } from "@/utils/supabase/server";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="ko" className={`${outfit.variable}`}>
       <body className="antialiased font-sans">
-        <Navbar />
+        <Navbar initialUser={user} />
         {children}
       </body>
     </html>
