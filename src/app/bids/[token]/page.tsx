@@ -16,6 +16,7 @@ import {
     FileText,
     Calculator,
     MapPin,
+    Maximize2,
     Trophy
 } from "lucide-react";
 import ProfitabilityTable from "@/components/leads/ProfitabilityTable";
@@ -33,24 +34,38 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
         const adminSupabase = createAdminClient();
         const supabase = adminSupabase || await createClient();
 
-        // Fetch bid with company and lead info using admin client (bypasses RLS)
-        const { data: bid, error } = await supabase
+        // 1. Fetch bid info
+        const { data: bid, error: bidError } = await supabase
             .from('bids')
-            .select(`
-                *,
-                company:companies(*),
-                lead:leads(*)
-            `)
+            .select('*')
             .eq('view_token', token)
-            .single();
+            .maybeSingle();
 
-        if (error || !bid || !bid.company || !bid.lead) {
-            console.error("Bid load error:", error);
+        if (bidError || !bid) {
+            console.error("Bid not found or error:", bidError);
             notFound();
         }
 
-        const company = bid.company;
-        const lead = bid.lead;
+        // 2. Fetch company & lead info separately to ensure RLS doesn't block the whole join
+        // Using the same client (which might be adminSupabase if available)
+        const { data: company, error: companyError } = await supabase
+            .from('companies')
+            .select('*')
+            .eq('id', bid.company_id)
+            .single();
+
+        const { data: lead, error: leadError } = await supabase
+            .from('leads')
+            .select('*')
+            .eq('id', bid.lead_id)
+            .single();
+
+        if (companyError || leadError || !company || !lead) {
+            console.error("Related data load error:", { companyError, leadError });
+            // Even if lead is missing, we might want to show company/bid? 
+            // But usually all 3 are required for this page.
+            notFound();
+        }
 
         const formatWon = (val: number) => {
             return (val || 0).toLocaleString() + '원';
@@ -92,25 +107,36 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
                         {/* Left & Middle: Quote Details */}
                         <div className="lg:col-span-2 space-y-12">
                             {/* Title & Status */}
-                            <div className="p-10 md:p-16 bg-white/2 border border-white/10 rounded-[48px] relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 blur-[120px] -mr-48 -mt-48 rounded-full"></div>
+                            <div className="p-10 md:p-16 bg-white/2 border border-white/10 rounded-[48px] relative overflow-hidden group/header">
+                                <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 blur-[120px] -mr-48 -mt-48 rounded-full group-hover/header:bg-accent/20 transition-colors duration-700"></div>
 
-                                <div className="relative space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <span className="px-4 py-1.5 bg-accent text-white rounded-full text-[10px] font-black uppercase tracking-widest">
-                                            PROPOSAL
-                                        </span>
-                                        <span className="px-4 py-1.5 bg-white/5 text-white/60 rounded-full text-[10px] font-bold">
-                                            발송일: {new Date(bid.created_at).toLocaleDateString()}
-                                        </span>
+                                <div className="relative space-y-8">
+                                    <div className="flex items-center gap-4">
+                                        <div className="px-5 py-2 bg-accent text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-accent/20">
+                                            Premium Proposal
+                                        </div>
+                                        <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-bold text-white/60">
+                                            <Clock size={12} />
+                                            제안일: {new Date(bid.created_at).toLocaleDateString()}
+                                        </div>
                                     </div>
-                                    <h1 className="text-4xl md:text-6xl font-black text-white leading-tight">
+
+                                    <h1 className="text-4xl md:text-7xl font-black text-white leading-[1.1] tracking-tight">
                                         {company.company_name}의<br />
-                                        <span className="text-accent underline decoration-8 decoration-accent/20 underline-offset-8">상세 견적서</span>입니다.
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400">마스터 플랜</span>입니다.
                                     </h1>
-                                    <p className="text-white/40 text-lg max-w-xl leading-relaxed">
-                                        "{lead.address}" 부지에 최적화된 시공 계획과 수익 분석 결과를 제안합니다.
-                                    </p>
+
+                                    <div className="flex flex-wrap items-center gap-6 pt-4 text-white/60">
+                                        <div className="flex items-center gap-2">
+                                            <MapPin size={18} className="text-accent" />
+                                            <span className="font-medium">{lead.address}</span>
+                                        </div>
+                                        <div className="w-1.5 h-1.5 bg-white/10 rounded-full hidden md:block"></div>
+                                        <div className="flex items-center gap-2">
+                                            <Maximize2 size={18} className="text-accent" />
+                                            <span className="font-medium">부지 면적: {lead.area_sqm.toLocaleString()}㎡</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -118,7 +144,7 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
                             <div className="grid sm:grid-cols-3 gap-6">
                                 <DetailCard
                                     icon={<Zap className="text-accent" />}
-                                    label="설치 예상 용량"
+                                    label="설치 예정 용량"
                                     value={`${bid.capacity_kw} kW`}
                                     sub={`유형: ${bid.project_type === 'rooftop' ? '지붕형' : bid.project_type === 'ground' ? '지상형' : '영농형'}`}
                                 />
@@ -131,9 +157,9 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
                                 />
                                 <DetailCard
                                     icon={<Calendar className="text-accent" />}
-                                    label="공사 기간 / 유효기간"
+                                    label="예상 공기 / 유효기간"
                                     value={bid.construction_period || '협의 필요'}
-                                    sub={`유효기간: ${bid.valid_thru || '미지정'}`}
+                                    sub={`견적 유효기간: ${bid.valid_thru || '미지정'}`}
                                 />
                             </div>
 
@@ -154,12 +180,48 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
 
                                 {bid.exclusions && (
                                     <div className="mt-8 pt-8 border-t border-white/5">
-                                        <h4 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-4">불포함 항목</h4>
-                                        <p className="text-white/60 leading-relaxed bg-red-500/5 p-6 rounded-2xl border border-red-500/10 whitespace-pre-wrap">
-                                            {bid.exclusions}
-                                        </p>
+                                        <h4 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-4 text-center md:text-left">필독: 견적 제외 항목</h4>
+                                        <div className="p-8 bg-red-500/5 rounded-[32px] border border-red-500/10 backdrop-blur-sm">
+                                            <p className="text-white/70 leading-relaxed whitespace-pre-wrap text-sm">
+                                                {bid.exclusions}
+                                            </p>
+                                        </div>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Equipment Specs Section */}
+                            <div className="p-10 md:p-12 bg-white/2 border border-white/5 rounded-[48px] space-y-10">
+                                <div className="space-y-2">
+                                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                                        <Zap className="text-accent" />
+                                        주요 기자재 및 사양
+                                    </h3>
+                                    <p className="text-white/30 text-sm">본 시공에 사용될 정품 인증 기자재 정보입니다.</p>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <SpecCard
+                                        label="태양광 모듈"
+                                        value="1급 브랜드 정품 (n형 고효율)"
+                                        desc="출력 효율 21.5% 이상, 하프컷 기술 적용"
+                                    />
+                                    <SpecCard
+                                        label="인버터"
+                                        value="LS/현대/한화 등 KS 인증 제품"
+                                        desc="멀티 MPPT 적용으로 발전 효율 극대화"
+                                    />
+                                    <SpecCard
+                                        label="구조물"
+                                        value="용융아연도금 / 포스맥(PosMAC)"
+                                        desc="내부식성 강화로 25년 이상 내구성 보장"
+                                    />
+                                    <SpecCard
+                                        label="모니터링"
+                                        value="실시간 RTU 원격 관리 시스템"
+                                        desc="모바일 앱을 통한 실시간 발전량 확인"
+                                    />
+                                </div>
                             </div>
 
                             {/* Warranty & AS */}
@@ -294,6 +356,16 @@ function InfoRow({ label, value }: { label: string, value: string }) {
         <div className="flex justify-between items-start gap-4 text-sm">
             <span className="text-white/20 shrink-0">{label}</span>
             <span className="text-white font-bold text-right">{value}</span>
+        </div>
+    );
+}
+
+function SpecCard({ label, value, desc }: { label: string, value: string, desc?: string }) {
+    return (
+        <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3 hover:border-accent/30 transition-all">
+            <div className="text-[10px] font-black text-accent uppercase tracking-wider">{label}</div>
+            <div className="text-lg font-bold text-white">{value}</div>
+            <div className="text-xs text-white/40 leading-relaxed">{desc}</div>
         </div>
     );
 }
