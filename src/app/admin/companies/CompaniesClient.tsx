@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { cn } from '@/utils/cn';
 
 interface Company {
     id: string;
@@ -80,15 +81,17 @@ export default function CompaniesClient({ initialCompanies }: CompaniesClientPro
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex bg-gray-100 p-1 rounded-lg">
+                <div className="flex bg-slate-900/50 p-1 rounded-2xl border border-white/5 backdrop-blur-sm">
                     {(['pending', 'approved', 'rejected'] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
-                                }`}
+                            className={cn(
+                                "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+                                activeTab === tab
+                                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                    : "text-slate-400 hover:text-white"
+                            )}
                         >
                             {tab === 'pending' && '승인 대기'}
                             {tab === 'approved' && '승인 완료'}
@@ -97,60 +100,63 @@ export default function CompaniesClient({ initialCompanies }: CompaniesClientPro
                     ))}
                 </div>
 
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <div className="relative group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 w-4 h-4 transition-colors" />
                     <input
                         type="text"
                         placeholder="업체명 또는 사업자번호 검색"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 outline-none w-full md:w-64"
+                        className="pl-11 pr-6 py-3 bg-slate-900/50 border border-white/5 rounded-2xl text-sm focus:border-blue-500/50 outline-none w-full md:w-80 backdrop-blur-sm transition-all text-white placeholder:text-slate-600"
                     />
                 </div>
             </div>
 
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-slate-900/50 border border-white/5 rounded-[32px] overflow-hidden backdrop-blur-sm shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-100 font-medium text-gray-600 text-sm">
+                        <thead className="bg-white/5 border-b border-white/5 font-bold text-slate-400 text-[10px] uppercase tracking-widest">
                             <tr>
-                                <th className="px-6 py-4">업체 정보</th>
-                                <th className="px-6 py-4">대표자 / 연락처</th>
-                                <th className="px-6 py-4">가입일</th>
-                                <th className="px-6 py-4 text-right">관리</th>
+                                <th className="px-8 py-5">업체 정보</th>
+                                <th className="px-8 py-5">대표자 / 연락처</th>
+                                <th className="px-8 py-5">가입일</th>
+                                <th className="px-8 py-5 text-right">관리</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50 text-sm">
+                        <tbody className="divide-y divide-white/5 text-sm">
                             {filteredCompanies.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
-                                        해당하는 업체가 없습니다.
+                                    <td colSpan={4} className="px-8 py-20 text-center text-slate-500">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Building2 size={40} className="text-slate-700 mb-2" />
+                                            <span className="font-bold">해당하는 업체가 없습니다.</span>
+                                        </div>
                                     </td>
                                 </tr>
                             ) : (
                                 filteredCompanies.map((company) => (
-                                    <tr key={company.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="font-semibold text-gray-900">{company.company_name}</div>
-                                            <div className="text-gray-500 text-xs">{company.business_number}</div>
-                                            <div className="text-gray-400 text-xs mt-1">{company.head_office_address}</div>
+                                    <tr key={company.id} className="hover:bg-white/5 transition-colors group">
+                                        <td className="px-8 py-6">
+                                            <div className="font-bold text-white group-hover:text-blue-400 transition-colors uppercase tracking-tight">{company.company_name}</div>
+                                            <div className="text-slate-400 text-xs mt-1 font-mono">{company.business_number}</div>
+                                            <div className="text-slate-500 text-[10px] mt-1 line-clamp-1">{company.head_office_address}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600">
-                                            <div>{company.rep_name || '-'}</div>
-                                            <div className="text-xs">{company.phone || '-'}</div>
+                                        <td className="px-8 py-6 text-slate-300">
+                                            <div className="font-semibold">{company.rep_name || '-'}</div>
+                                            <div className="text-xs text-slate-500 mt-1">{company.phone || '-'}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500 text-xs">
+                                        <td className="px-8 py-6 text-slate-400 text-xs font-medium">
                                             {company.registered_at
                                                 ? format(new Date(company.registered_at), 'yyyy.MM.dd HH:mm', { locale: ko })
                                                 : '-'}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-8 py-6 text-right">
                                             {activeTab === 'pending' && (
-                                                <div className="flex justify-end gap-2">
+                                                <div className="flex justify-end gap-3">
                                                     <button
                                                         onClick={() => handleApprove(company.id)}
                                                         disabled={isProcessing}
-                                                        className="px-3 py-1.5 bg-green-50 text-green-700 rounded hover:bg-green-100 transition-colors font-medium flex items-center gap-1"
+                                                        className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-500/20"
                                                     >
                                                         <CheckCircle2 size={14} />
                                                         승인
@@ -158,7 +164,7 @@ export default function CompaniesClient({ initialCompanies }: CompaniesClientPro
                                                     <button
                                                         onClick={() => handleRejectClick(company.id)}
                                                         disabled={isProcessing}
-                                                        className="px-3 py-1.5 bg-red-50 text-red-700 rounded hover:bg-red-100 transition-colors font-medium flex items-center gap-1"
+                                                        className="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 rounded-xl hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30 transition-all font-bold text-xs flex items-center gap-2"
                                                     >
                                                         <XCircle size={14} />
                                                         반려
@@ -166,12 +172,15 @@ export default function CompaniesClient({ initialCompanies }: CompaniesClientPro
                                                 </div>
                                             )}
                                             {activeTab === 'rejected' && (
-                                                <div className="text-red-600 text-xs italic">
+                                                <div className="flex items-center justify-end gap-2 text-red-500 text-xs font-bold italic">
+                                                    <AlertCircle size={12} />
                                                     사유: {company.rejection_reason}
                                                 </div>
                                             )}
                                             {activeTab === 'approved' && (
-                                                <span className="text-green-600 font-medium text-xs">승인 완료</span>
+                                                <span className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full font-bold text-[10px] border border-green-500/20 uppercase tracking-widest">
+                                                    승인 완료
+                                                </span>
                                             )}
                                         </td>
                                     </tr>
@@ -184,34 +193,35 @@ export default function CompaniesClient({ initialCompanies }: CompaniesClientPro
 
             {/* Rejection Modal */}
             {isRejectModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-                        <div className="flex items-center gap-2 text-red-600 mb-4 font-bold text-lg">
-                            <AlertCircle size={24} />
-                            가입 반려 사유 입력
+                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-slate-900 border border-white/10 rounded-[40px] shadow-2xl max-w-md w-full p-10 animate-in fade-in zoom-in duration-200">
+                        <div className="flex items-center gap-3 text-red-400 mb-6 font-extrabold text-2xl tracking-tighter">
+                            <XCircle size={32} />
+                            가입 반려 사유
                         </div>
-                        <p className="text-sm text-gray-500 mb-4">
-                            업체에게 전달될 가입 반려 사유를 입력해주세요.
+                        <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                            업체에게 전달될 가입 반려 사유를 입력해주세요. <br />
+                            이 사유는 시공사 대기 화면에 실시간으로 노출됩니다.
                         </p>
                         <textarea
                             value={rejectionReason}
                             onChange={(e) => setRejectionReason(e.target.value)}
-                            placeholder="예: 사업자등록번호가 일치하지 않습니다."
-                            className="w-full h-32 p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500 outline-none mb-6"
+                            placeholder="예: 사업자등록번호가 일치하지 않습니다. 고객센터로 문의 바랍니다."
+                            className="w-full h-32 p-4 bg-slate-950 border border-white/10 rounded-2xl text-sm focus:border-red-500 outline-none mb-8 text-white transition-all"
                         />
-                        <div className="flex gap-3">
+                        <div className="flex gap-4">
                             <button
                                 onClick={() => setIsRejectModalOpen(false)}
-                                className="flex-1 py-2 text-gray-500 font-medium hover:bg-gray-50 rounded-lg transition-colors"
+                                className="flex-1 py-4 text-slate-500 font-bold hover:text-white transition-colors"
                             >
                                 취소
                             </button>
                             <button
                                 onClick={handleRejectConfirm}
                                 disabled={!rejectionReason.trim() || isProcessing}
-                                className="flex-1 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                className="flex-1 py-4 bg-red-600 text-white font-extrabold rounded-2xl hover:bg-red-500 transition-all disabled:opacity-50 shadow-xl shadow-red-500/20"
                             >
-                                {isProcessing ? '처리 중...' : '반려 처리'}
+                                {isProcessing ? '처리 중...' : '반려 처리 완료'}
                             </button>
                         </div>
                     </div>
