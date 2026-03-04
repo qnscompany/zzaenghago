@@ -50,7 +50,7 @@ export default function AdminWorkQueue() {
                 { data: inquiries }
             ] = await Promise.all([
                 supabase.from('companies').select('id, company_name, registered_at').eq('match_status', 'pending'),
-                supabase.from('profile_updates').select('id, company_id, companies(company_name), created_at').eq('status', 'pending'),
+                supabase.from('profile_updates').select('id, company_id, created_at, companies(company_name)').eq('status', 'pending'),
                 supabase.from('leads').select('id, address, bid_count, created_at, status'),
                 supabase.from('inquiries').select('id, title, status, created_at, category')
             ]);
@@ -81,7 +81,7 @@ export default function AdminWorkQueue() {
                     priority: 5,
                     label: '정보 변경 승인 대기',
                     icon: '✏️',
-                    targetName: (u.companies as any)?.company_name || '알 수 없는 업체',
+                    targetName: (u.companies as unknown as { company_name: string })?.company_name || '알 수 없는 업체',
                     createdAt: u.created_at,
                     status: 'pending',
                     actionUrl: `/admin/profile-updates`,
