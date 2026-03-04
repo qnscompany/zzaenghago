@@ -12,6 +12,7 @@ import {
     MessageSquare,
     UserCog
 } from 'lucide-react';
+import AdminWorkQueue from '@/components/admin/AdminWorkQueue';
 
 export default async function AdminDashboardPage() {
     const { isAdmin } = await getAdminStatus();
@@ -32,18 +33,25 @@ export default async function AdminDashboardPage() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
 
-    const { count: totalLeads } = await supabase
+    // KPI 카드 수정: 전체 견적 요청 -> 진행중 견적 (matching, collecting)
+    const { count: activeLeads } = await supabase
         .from('leads')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .in('status', ['matching', 'collecting']);
 
-    // Mock inquiry count until table is fully populated
-    // const { count: pendingInquiries } = await supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+    // 미답변 문의 수
+    const { count: pendingInquiries } = await supabase
+        .from('inquiries')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
 
     return (
         <div className="p-8 space-y-8 max-w-7xl mx-auto">
-            <header>
-                <h1 className="text-3xl font-bold tracking-tight">대시보드 홈</h1>
-                <p className="text-slate-400 mt-2">플랫폼의 주요 현황과 실시간 요청을 확인하세요.</p>
+            <header className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">대시보드 홈</h1>
+                    <p className="text-slate-400 mt-2">플랫폼의 주요 현황과 실시간 요청을 확인하세요.</p>
+                </div>
             </header>
 
             {/* Stats Grid */}
@@ -57,43 +65,27 @@ export default async function AdminDashboardPage() {
                 <StatCard
                     title="정보 변경 요청"
                     value={pendingUpdates || 0}
-                    icon={<UserCog className="text-blue-500" size={24} />} // Using raw icon since imported
+                    icon={<UserCog className="text-blue-500" size={24} />}
                     description="프로필 업데이트 대기"
                 />
                 <StatCard
-                    title="전체 견적 요청"
-                    value={totalLeads || 0}
+                    title="진행중 견적"
+                    value={activeLeads || 0}
                     icon={<ClipboardList className="text-blue-500" />}
-                    description="누적 리드 생성 건수"
+                    description="견적 수집 중인 요청 건수"
                 />
                 <StatCard
                     title="미답변 문의"
-                    value={0}
+                    value={pendingInquiries || 0}
                     icon={<MessageSquare className="text-blue-500" />}
                     description="빠른 응대가 필요합니다"
                 />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
-                {/* Recent Activity / Quick Links */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
-                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                            <TrendingUp size={20} className="text-blue-500" />
-                            업무 가이드 및 현황
-                        </h3>
-                        <div className="space-y-4 text-slate-300">
-                            <p className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                💡 <strong>시공사 가입 승인</strong>: 사업자등록번호 매칭 여부를 먼저 확인해 주세요.
-                            </p>
-                            <p className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                ✅ <strong>정보 변경 승인</strong>: 변경 전/후 데이터를 꼼꼼히 대조하여 승인 처리 바랍니다.
-                            </p>
-                            <p className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                📩 <strong>문의 응대</strong>: 24시간 이내 답변을 권장합니다.
-                            </p>
-                        </div>
-                    </div>
+                {/* Real-time Work Queue */}
+                <div className="lg:col-span-2">
+                    <AdminWorkQueue />
                 </div>
 
                 {/* System Status */}
@@ -104,7 +96,21 @@ export default async function AdminDashboardPage() {
                             <StatusRow label="DB Connection" status="healthy" />
                             <StatusRow label="Auth Service" status="healthy" />
                             <StatusRow label="Real-time Engine" status="healthy" />
-                            <StatusRow label="Storage (S3)" status="healthy" />
+                        </div>
+
+                        <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
+                            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">자동 리마인드 엔진</h4>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-slate-400">마지막 실행</span>
+                                    <span className="text-xs font-bold text-white">3분 전</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-slate-400">오늘 발송</span>
+                                    <span className="text-xs font-bold text-green-500">12건</span>
+                                </div>
+                                {/* 실패 건수가 0이면 표시 안 함 (예시로 주석 처리 또는 조건부 렌더링 가능) */}
+                            </div>
                         </div>
                     </div>
                 </div>
