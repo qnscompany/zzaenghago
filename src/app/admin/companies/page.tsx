@@ -1,17 +1,16 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
+import { getAdminStatus } from '@/utils/auth';
 import CompaniesClient from './CompaniesClient';
 import { Building2 } from 'lucide-react';
-import { cn } from '@/utils/cn';
 
 export default async function AdminCompaniesPage() {
-    const supabase = await createClient();
-
-    // Check admin authorization
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata.role !== 'admin') {
+    const { isAdmin } = await getAdminStatus();
+    if (!isAdmin) {
         redirect('/');
     }
+
+    const supabase = await createClient();
 
     const { data: companies, error } = await supabase
         .from('companies')

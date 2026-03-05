@@ -10,7 +10,6 @@ export async function approveCompany(companyId: string) {
         .from('companies')
         .update({
             match_status: 'approved',
-            approved_at: new Date().toISOString()
         })
         .eq('id', companyId);
 
