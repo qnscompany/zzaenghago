@@ -16,6 +16,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
+import { getAdminStatus } from "@/utils/auth";
 
 export default async function RootLayout({
   children,
@@ -24,6 +25,8 @@ export default async function RootLayout({
 }>) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { role } = await getAdminStatus();
+
   const headersList = await headers();
   const pathname = headersList.get("x-invoke-path") || "";
   const isAdminPath = pathname.startsWith("/admin");
@@ -31,7 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="ko" className={`${outfit.variable}`}>
       <body className="antialiased font-sans">
-        {!isAdminPath && <Navbar initialUser={user} />}
+        {!isAdminPath && <Navbar initialUser={user} initialRole={role} />}
         {children}
         {!isAdminPath && <Footer />}
       </body>

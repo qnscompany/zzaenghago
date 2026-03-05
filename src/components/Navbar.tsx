@@ -6,8 +6,9 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { signOut } from "@/app/auth/actions";
 
-export default function Navbar({ initialUser }: { initialUser?: any }) {
+export default function Navbar({ initialUser, initialRole }: { initialUser?: any, initialRole?: string | null }) {
     const [user, setUser] = useState<any>(initialUser);
+    const [role, setRole] = useState<string | null>(initialRole || initialUser?.user_metadata?.role || null);
     const [loading, setLoading] = useState(!initialUser);
     const supabase = createClient();
 
@@ -15,19 +16,32 @@ export default function Navbar({ initialUser }: { initialUser?: any }) {
         const checkAuth = async () => {
             if (!initialUser) {
                 const { data: { session } } = await supabase.auth.getSession();
-                setUser(session?.user ?? null);
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
+
+                if (currentUser && !initialRole) {
+                    // 런타임에 role이 없는 경우에만 추가 조회 (거의 발생 안 함)
+                    const { data } = await supabase.from('users').select('role').eq('id', currentUser.id).single();
+                    setRole(data?.role || currentUser.user_metadata?.role || null);
+                }
             }
             setLoading(false);
         };
         checkAuth();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+            if (currentUser) {
+                setRole(currentUser.user_metadata?.role || null);
+            } else {
+                setRole(null);
+            }
             setLoading(false);
         });
 
         return () => subscription.unsubscribe();
-    }, [supabase.auth, initialUser]);
+    }, [supabase, initialUser, initialRole]);
 
     return (
         <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/10">
@@ -42,14 +56,14 @@ export default function Navbar({ initialUser }: { initialUser?: any }) {
                         <Link href="/about" className="hover:text-accent transition-colors">서비스 소개</Link>
                         {user && (
                             <>
-                                {user.user_metadata.role === 'admin' ? (
+                                {role === 'admin' ? (
                                     <>
                                         <Link href="/dashboard/company" className="hover:text-accent transition-colors">시공사 대시보드</Link>
                                         <Link href="/admin" className="hover:text-accent transition-colors">관리자 대시보드</Link>
                                     </>
                                 ) : (
                                     <Link
-                                        href={user.user_metadata.role === 'company' ? '/dashboard/company' : '/leads'}
+                                        href={role === 'company' ? '/dashboard/company' : '/leads'}
                                         className="hover:text-accent transition-colors"
                                     >
                                         대시보드
@@ -62,7 +76,7 @@ export default function Navbar({ initialUser }: { initialUser?: any }) {
                             user ? (
                                 <div className="flex items-center gap-4">
                                     <span className="text-foreground/60 text-xs flex items-center gap-1">
-                                        {user.user_metadata.role === 'company' ? <Building2 size={14} /> : <User size={14} />}
+                                        {role === 'company' ? <Building2 size={14} /> : <User size={14} />}
                                         {user.email}
                                     </span>
                                     <form action={signOut}>
