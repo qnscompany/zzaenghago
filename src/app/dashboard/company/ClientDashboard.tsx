@@ -35,6 +35,11 @@ export default function ClientDashboard({ leads, kakaoKey }: { leads: any[], kak
     });
 
     useEffect(() => {
+        // Refresh data when the dashboard is loaded to ensure latest stats
+        router.refresh();
+    }, [router]);
+
+    useEffect(() => {
         console.log("Kakao Map Debug Info:", {
             hasKey: !!KAKAO_KEY,
             keyHead: KAKAO_KEY?.slice(0, 5),

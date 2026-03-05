@@ -119,7 +119,7 @@ export default async function BidViewPage({ params }: { params: Promise<{ token:
 
                                     <h1 className="text-4xl md:text-7xl font-black text-white leading-[1.1] tracking-tight">
                                         {company.company_name}의<br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400">마스터 플랜</span>입니다.
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400">제안</span>입니다.
                                     </h1>
 
                                     <div className="flex flex-wrap items-center gap-6 pt-4 text-white/60">

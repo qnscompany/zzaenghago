@@ -13,24 +13,28 @@ export default async function BidCreatePage({ params }: { params: Promise<{ id: 
         redirect('/auth/login');
     }
 
-    // Check if company exists and get credits
-    const { data: companyData, error: companyError } = await supabase
+    // Check if company exists
+    const { data: company, error: companyError } = await supabase
         .from('companies')
         .select(`
             id, 
-            company_name,
-            credits:credits(balance)
+            company_name
         `)
         .eq('user_id', user.id)
         .single();
 
-    const company = companyData as any;
+    // Fetch credits separately to avoid join issues
+    const { data: creditsData } = await supabase
+        .from('credits')
+        .select('balance')
+        .eq('company_id', company?.id)
+        .maybeSingle();
 
     if (companyError || !company) {
         redirect('/dashboard/company/profile');
     }
 
-    const creditBalance = company.credits?.[0]?.balance ?? 0;
+    const creditBalance = (creditsData as any)?.balance ?? 0;
 
     // Check if bid already exists (to prevent duplicate page entry)
     const { data: existingBid } = await supabase

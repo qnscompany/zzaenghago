@@ -68,7 +68,7 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: any
                                         href={role === 'company' ? '/dashboard/company' : '/leads'}
                                         className="hover:text-accent transition-colors"
                                     >
-                                        대시보드
+                                        {role === 'company' ? '고객 관리' : '내 부지 목록'}
                                     </Link>
                                 )}
                             </>
