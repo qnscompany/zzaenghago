@@ -29,11 +29,13 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: any
         };
         checkAuth();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
             if (currentUser) {
-                setRole(currentUser.user_metadata?.role || null);
+                // Metadata 보다는 DB의 최신 정보를 우선하되, 없으면 Metadata라도 시도
+                const { data } = await supabase.from('users').select('role').eq('id', currentUser.id).single();
+                setRole(data?.role || currentUser.user_metadata?.role || null);
             } else {
                 setRole(null);
             }
