@@ -42,15 +42,19 @@ export default function Navbar({ initialUser }: { initialUser?: any }) {
                         <Link href="/about" className="hover:text-accent transition-colors">서비스 소개</Link>
                         {user && (
                             <>
-                                <Link
-                                    href={
-                                        user.user_metadata.role === 'admin' ? '/admin' :
-                                            user.user_metadata.role === 'company' ? '/dashboard/company' : '/leads'
-                                    }
-                                    className="hover:text-accent transition-colors"
-                                >
-                                    대시보드
-                                </Link>
+                                {user.user_metadata.role === 'admin' ? (
+                                    <>
+                                        <Link href="/dashboard/company" className="hover:text-accent transition-colors">시공사 대시보드</Link>
+                                        <Link href="/admin" className="hover:text-accent transition-colors">관리자 대시보드</Link>
+                                    </>
+                                ) : (
+                                    <Link
+                                        href={user.user_metadata.role === 'company' ? '/dashboard/company' : '/leads'}
+                                        className="hover:text-accent transition-colors"
+                                    >
+                                        대시보드
+                                    </Link>
+                                )}
                             </>
                         )}
 
