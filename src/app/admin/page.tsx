@@ -10,7 +10,9 @@ import {
     CheckCircle2,
     XCircle,
     MessageSquare,
-    UserCog
+    UserCog,
+    Coins,
+    Sun
 } from 'lucide-react';
 
 export default async function AdminDashboardPage() {
@@ -36,6 +38,16 @@ export default async function AdminDashboardPage() {
         .from('leads')
         .select('*', { count: 'exact', head: true });
 
+    const { count: totalCustomers } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'customer');
+
+    const { count: approvedCompanies } = await supabase
+        .from('companies')
+        .select('*', { count: 'exact', head: true })
+        .eq('match_status', 'approved');
+
     // Mock inquiry count until table is fully populated
     // const { count: pendingInquiries } = await supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'pending');
 
@@ -47,7 +59,7 @@ export default async function AdminDashboardPage() {
             </header>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
                 <StatCard
                     title="가입 대기 시공사"
                     value={pendingCompanies || 0}
@@ -71,6 +83,18 @@ export default async function AdminDashboardPage() {
                     value={0}
                     icon={<MessageSquare className="text-blue-500" />}
                     description="빠른 응대가 필요합니다"
+                />
+                <StatCard
+                    title="발전사업자"
+                    value={totalCustomers || 0}
+                    icon={<Sun className="text-orange-400" />}
+                    description="가입 고객 누적"
+                />
+                <StatCard
+                    title="승인 시공사"
+                    value={approvedCompanies || 0}
+                    icon={<Coins className="text-amber-400" />}
+                    description="활성 시공 파트너"
                 />
             </div>
 

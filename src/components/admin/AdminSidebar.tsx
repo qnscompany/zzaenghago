@@ -11,7 +11,9 @@ import {
     GitBranch,
     Settings,
     ChevronRight,
-    Sun
+    Sun,
+    Users,
+    Coins
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -19,6 +21,8 @@ const menuItems = [
     { name: '대시보드 홈', href: '/admin', icon: LayoutDashboard },
     { name: '시공사 가입 승인', href: '/admin/companies', icon: Building2 },
     { name: '정보 변경 승인', href: '/admin/profile-updates', icon: UserCog },
+    { name: '발전사업자 관리', href: '/admin/users', icon: Users },
+    { name: '크레딧 관리', href: '/admin/credits', icon: Coins },
     { name: '고객 문의 응대', href: '/admin/inquiries', icon: MessageSquare },
     { name: '견적 매칭 관제', href: '/admin/matching', icon: GitMerge },
     { name: 'GitHub 인사이트', href: '/admin/github', icon: GitBranch },
