@@ -20,6 +20,7 @@ const menuItems = [
     { name: '정보 변경 승인', href: '/admin/profile-updates', icon: UserCog },
     { name: '고객 문의 응대', href: '/admin/inquiries', icon: MessageSquare },
     { name: '견적 매칭 관제', href: '/admin/matching', icon: GitMerge },
+    { name: 'GitHub 인사이트', href: '/admin/github', icon: GitBranch },
 ];
 
 export default function AdminSidebar() {
