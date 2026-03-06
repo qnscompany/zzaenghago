@@ -71,7 +71,7 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: any
                                         >
                                             {role === 'company' ? '고객 관리' : '내 부지 목록'}
                                         </Link>
-                                        <Link href="/dashboard/inquiries" className="hover:text-accent transition-colors">고객 문의</Link>
+                                        <Link href="/dashboard/inquiries" className="hover:text-accent transition-colors">운영자에 문의</Link>
                                     </>
                                 )}
                             </>

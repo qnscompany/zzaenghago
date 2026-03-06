@@ -23,7 +23,7 @@ const menuItems = [
     { name: '정보 변경 승인', href: '/admin/profile-updates', icon: UserCog },
     { name: '발전사업자 관리', href: '/admin/users', icon: Users },
     { name: '크레딧 관리', href: '/admin/credits', icon: Coins },
-    { name: '고객 문의 응대', href: '/admin/inquiries', icon: MessageSquare },
+    { name: '운영자 문의 응대', href: '/admin/inquiries', icon: MessageSquare },
     { name: '견적 매칭 관제', href: '/admin/matching', icon: GitMerge },
 ];
 

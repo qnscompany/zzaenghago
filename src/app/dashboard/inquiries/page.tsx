@@ -12,7 +12,7 @@ export default async function InquiriesPage() {
             <div className="max-w-[1000px] mx-auto space-y-8">
                 <header className="flex justify-between items-end">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-white">고객 문의 내역</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-white">운영자 문의 내역</h1>
                         <p className="text-foreground/40 mt-2">문의하신 내용과 답변을 확인하실 수 있습니다.</p>
                     </div>
                     <Link
