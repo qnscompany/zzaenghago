@@ -1,9 +1,11 @@
-import { getMyInquiries } from './actions';
+import { getMyInquiries, markMyInquiriesAsRead } from './actions';
 import Link from 'next/link';
 import { MessageSquare, Plus, Clock, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default async function InquiriesPage() {
+    // 페이지 진입 시 자동으로 읽음 처리
+    await markMyInquiriesAsRead();
     const inquiries = await getMyInquiries();
 
     return (

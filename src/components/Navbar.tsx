@@ -6,10 +6,21 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import type { User as AuthUser } from "@supabase/supabase-js";
 import { signOut } from "@/app/auth/actions";
+import { useRouter } from "next/navigation";
 
-export default function Navbar({ initialUser, initialRole }: { initialUser?: AuthUser | null, initialRole?: string | null }) {
+export default function Navbar({
+    initialUser,
+    initialRole,
+    initialUnreadCount = 0
+}: {
+    initialUser?: AuthUser | null,
+    initialRole?: string | null,
+    initialUnreadCount?: number
+}) {
+    const router = useRouter();
     const [user, setUser] = useState<AuthUser | null>(initialUser || null);
     const [role, setRole] = useState<string | null>(initialRole || initialUser?.user_metadata?.role || null);
+    const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
     const [loading, setLoading] = useState(!initialUser);
     const supabase = createClient();
 
@@ -46,6 +57,13 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: Aut
         return () => subscription.unsubscribe();
     }, [supabase, initialUser, initialRole]);
 
+    const handleSignOut = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await signOut();
+        router.push('/');
+        router.refresh();
+    };
+
     return (
         <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/10">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,7 +90,14 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: Aut
                                         >
                                             {role === 'company' ? '고객 관리' : '내 부지 목록'}
                                         </Link>
-                                        <Link href="/dashboard/inquiries" className="hover:text-accent transition-colors">운영자에 문의</Link>
+                                        <Link href="/dashboard/inquiries" className="hover:text-accent transition-colors flex items-center gap-1">
+                                            운영자에 문의
+                                            {unreadCount > 0 && (
+                                                <span className="flex items-center justify-center bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full animate-pulse">
+                                                    {unreadCount}
+                                                </span>
+                                            )}
+                                        </Link>
                                     </>
                                 )}
                             </>
@@ -85,7 +110,7 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: Aut
                                         {role === 'company' ? <Building2 size={14} /> : <User size={14} />}
                                         {user.email}
                                     </span>
-                                    <form action={signOut}>
+                                    <form onSubmit={handleSignOut}>
                                         <button type="submit" className="text-foreground/60 hover:text-red-400 transition-colors flex items-center gap-1">
                                             <LogOut size={16} />
                                             로그아웃

@@ -27,6 +27,10 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser();
   const { role } = await getAdminStatus();
 
+  // 알림 개수 가져오기
+  const { getUnreadInquiryCount } = await import('@/app/dashboard/inquiries/actions');
+  const unreadCount = user ? await getUnreadInquiryCount() : 0;
+
   const headersList = await headers();
   const pathname = headersList.get("x-invoke-path") || "";
   const isAdminPath = pathname.startsWith("/admin");
@@ -34,7 +38,7 @@ export default async function RootLayout({
   return (
     <html lang="ko" className={`${outfit.variable}`}>
       <body className="antialiased font-sans">
-        {!isAdminPath && <Navbar initialUser={user} initialRole={role} />}
+        {!isAdminPath && <Navbar initialUser={user} initialRole={role} initialUnreadCount={unreadCount} />}
         {children}
         {!isAdminPath && <Footer />}
       </body>
