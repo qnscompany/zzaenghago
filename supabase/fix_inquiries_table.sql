@@ -1,4 +1,4 @@
--- 1. Create inquiries table
+-- 1.-- 1. Ensure the inquiries table exists with correct schema
 CREATE TABLE IF NOT EXISTS public.inquiries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
@@ -8,37 +8,44 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'answered')),
     answer TEXT,
     answered_at TIMESTAMPTZ,
-    admin_id UUID REFERENCES public.users(id),
+    admin_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- 2. Enable RLS
+-- 2. Force admin role for the known admin email
+UPDATE public.users SET role = 'admin' WHERE email = 'qnscompany88@gmail.com';
+
+-- 3. Enable RLS on inquiries (if not already)
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 
--- 3. RLS Policies
--- Drop existing policies if any to avoid conflicts
+-- 4. Inquiries Policies
 DROP POLICY IF EXISTS "Users can view their own inquiries" ON public.inquiries;
-DROP POLICY IF EXISTS "Users can create their own inquiries" ON public.inquiries;
-DROP POLICY IF EXISTS "Admins can view all inquiries" ON public.inquiries;
-DROP POLICY IF EXISTS "Admins can update inquiries" ON public.inquiries;
-
--- Create policies
 CREATE POLICY "Users can view their own inquiries" ON public.inquiries
     FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create their own inquiries" ON public.inquiries;
 CREATE POLICY "Users can create their own inquiries" ON public.inquiries
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Updated Admin Policies using service_role or meta-data check if possible, 
--- but for standard Supabase JWT we can use the role from metadata if it's synced
+DROP POLICY IF EXISTS "Admins can view all inquiries" ON public.inquiries;
 CREATE POLICY "Admins can view all inquiries" ON public.inquiries
     FOR SELECT USING (
-        (auth.jwt() ->> 'email') = 'qnscompany88@gmail.com' OR
-        (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
+        (SELECT role FROM public.users WHERE id = auth.uid()) = 'admin' OR 
+        auth.jwt() ->> 'email' = 'qnscompany88@gmail.com'
     );
 
+DROP POLICY IF EXISTS "Admins can update inquiries" ON public.inquiries;
 CREATE POLICY "Admins can update inquiries" ON public.inquiries
     FOR UPDATE USING (
-        (auth.jwt() ->> 'email') = 'qnscompany88@gmail.com' OR
-        (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
+        (SELECT role FROM public.users WHERE id = auth.uid()) = 'admin' OR 
+        auth.jwt() ->> 'email' = 'qnscompany88@gmail.com'
+    );
+
+-- 5. IMPORTANT: Add policy to users table so admins can see emails of people who inquired
+-- Without this, the join in the admin inquiry page might fail or hide records
+DROP POLICY IF EXISTS "Admins can view all user profiles" ON public.users;
+CREATE POLICY "Admins can view all user profiles" ON public.users
+    FOR SELECT USING (
+        (SELECT role FROM public.users WHERE id = auth.uid()) = 'admin' OR 
+        auth.jwt() ->> 'email' = 'qnscompany88@gmail.com'
     );
