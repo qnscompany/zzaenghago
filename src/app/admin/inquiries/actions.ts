@@ -9,7 +9,7 @@ export async function getInquiries() {
         .from('inquiries')
         .select(`
             *,
-            user:users (email)
+            user:users!user_id (email)
         `)
         .order('created_at', { ascending: false });
 
