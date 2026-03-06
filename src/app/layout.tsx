@@ -17,6 +17,7 @@ import Footer from "@/components/Footer";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { getAdminStatus } from "@/utils/auth";
+import { getUnreadInquiryCount } from "@/app/dashboard/inquiries/actions";
 
 export default async function RootLayout({
   children,
@@ -27,13 +28,19 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser();
   const { role } = await getAdminStatus();
 
-  // 알림 개수 가져오기
-  const { getUnreadInquiryCount } = await import('@/app/dashboard/inquiries/actions');
-  const unreadCount = user ? await getUnreadInquiryCount() : 0;
+  // 알림 개수 가져오기 (오류 시 0으로 처리하여 전체 장애 방지)
+  let unreadCount = 0;
+  try {
+    if (user) {
+      unreadCount = await getUnreadInquiryCount();
+    }
+  } catch (error) {
+    console.error('Error fetching unread count:', error);
+  }
 
   const headersList = await headers();
-  const pathname = headersList.get("x-invoke-path") || "";
-  const isAdminPath = pathname.startsWith("/admin");
+  const pathname = headersList.get("x-invoke-path") || headersList.get("referer") || "";
+  const isAdminPath = pathname.includes("/admin");
 
   return (
     <html lang="ko" className={`${outfit.variable}`}>

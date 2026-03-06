@@ -74,5 +74,4 @@ export async function markMyInquiriesAsRead() {
         .eq('is_read', false);
 
     if (error) console.error('Error marking inquiries as read:', error);
-    revalidatePath('/dashboard/inquiries');
 }
