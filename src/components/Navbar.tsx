@@ -64,12 +64,15 @@ export default function Navbar({ initialUser, initialRole }: { initialUser?: any
                                         <Link href="/admin" className="hover:text-accent transition-colors">관리자 대시보드</Link>
                                     </>
                                 ) : (
-                                    <Link
-                                        href={role === 'company' ? '/dashboard/company' : '/leads'}
-                                        className="hover:text-accent transition-colors"
-                                    >
-                                        {role === 'company' ? '고객 관리' : '내 부지 목록'}
-                                    </Link>
+                                    <>
+                                        <Link
+                                            href={role === 'company' ? '/dashboard/company' : '/leads'}
+                                            className="hover:text-accent transition-colors"
+                                        >
+                                            {role === 'company' ? '고객 관리' : '내 부지 목록'}
+                                        </Link>
+                                        <Link href="/dashboard/inquiries" className="hover:text-accent transition-colors">고객 문의</Link>
+                                    </>
                                 )}
                             </>
                         )}
