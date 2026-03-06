@@ -138,7 +138,7 @@ export default function InquiriesClient({ initialInquiries }: { initialInquiries
                                             <div className="bg-blue-600/10 border border-blue-600/20 rounded-2xl p-6 text-blue-100 italic">
                                                 {inq.answer}
                                                 <p className="text-[10px] text-blue-400/50 mt-4 not-italic uppercase tracking-widest font-bold">
-                                                    Answered at {format(new Date(inq.answered_at), 'yyyy-MM-dd HH:mm')} by Admin
+                                                    Answered at {inq.answered_at ? format(new Date(inq.answered_at), 'yyyy-MM-dd HH:mm') : '-'} by Admin
                                                 </p>
                                             </div>
                                         </div>
