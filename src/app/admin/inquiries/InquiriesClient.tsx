@@ -27,6 +27,10 @@ interface Inquiry {
     created_at: string;
     user?: {
         email: string;
+        role?: string;
+        company?: {
+            company_name: string;
+        }[];
     };
 }
 
@@ -37,11 +41,18 @@ export default function InquiriesClient({ initialInquiries }: { initialInquiries
     const [answer, setAnswer] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const filteredInquiries = inquiries.filter(inq =>
-        inq.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inq.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inq.user?.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredInquiries = inquiries.filter(inq => {
+        const lowerSearch = searchTerm.toLowerCase();
+        const companyName = inq.user?.company?.[0]?.company_name?.toLowerCase() || '';
+        const userEmail = inq.user?.email?.toLowerCase() || '';
+
+        return (
+            inq.title.toLowerCase().includes(lowerSearch) ||
+            inq.content.toLowerCase().includes(lowerSearch) ||
+            userEmail.includes(lowerSearch) ||
+            companyName.includes(lowerSearch)
+        );
+    });
 
     const handleAnswer = async (id: string) => {
         if (!answer.trim()) return;
@@ -107,7 +118,9 @@ export default function InquiriesClient({ initialInquiries }: { initialInquiries
                                             </span>
                                             <h3 className="font-bold text-lg">{inq.title}</h3>
                                         </div>
-                                        <p className="text-sm text-slate-400">{inq.user?.email} • {format(new Date(inq.created_at), 'yyyy.MM.dd HH:mm')}</p>
+                                        <p className="text-sm text-slate-400">
+                                            {inq.user?.company?.[0]?.company_name || inq.user?.email} • {format(new Date(inq.created_at), 'yyyy.MM.dd HH:mm')}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
