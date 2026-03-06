@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Sun, LogOut, User, Building2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
+import type { User as AuthUser } from "@supabase/supabase-js";
 import { signOut } from "@/app/auth/actions";
 
-export default function Navbar({ initialUser, initialRole }: { initialUser?: any, initialRole?: string | null }) {
-    const [user, setUser] = useState<any>(initialUser);
+export default function Navbar({ initialUser, initialRole }: { initialUser?: AuthUser | null, initialRole?: string | null }) {
+    const [user, setUser] = useState<AuthUser | null>(initialUser || null);
     const [role, setRole] = useState<string | null>(initialRole || initialUser?.user_metadata?.role || null);
     const [loading, setLoading] = useState(!initialUser);
     const supabase = createClient();

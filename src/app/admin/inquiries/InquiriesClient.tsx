@@ -15,7 +15,22 @@ import { ko } from 'date-fns/locale';
 import { cn } from '@/utils/cn';
 import { answerInquiry } from './actions';
 
-export default function InquiriesClient({ initialInquiries }: { initialInquiries: any[] }) {
+interface Inquiry {
+    id: string;
+    user_id: string;
+    category: string;
+    title: string;
+    content: string;
+    status: 'pending' | 'answered';
+    answer?: string;
+    answered_at?: string;
+    created_at: string;
+    user?: {
+        email: string;
+    };
+}
+
+export default function InquiriesClient({ initialInquiries }: { initialInquiries: Inquiry[] }) {
     const [inquiries, setInquiries] = useState(initialInquiries);
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedId, setExpandedId] = useState<string | null>(null);

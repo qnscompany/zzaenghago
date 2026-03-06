@@ -2,7 +2,6 @@ import { getMyInquiries } from './actions';
 import Link from 'next/link';
 import { MessageSquare, Plus, Clock, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/utils/cn';
 
 export default async function InquiriesPage() {
     const inquiries = await getMyInquiries();

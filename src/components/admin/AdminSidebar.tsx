@@ -8,7 +8,6 @@ import {
     UserCog,
     MessageSquare,
     GitMerge,
-    GitBranch,
     Settings,
     ChevronRight,
     Sun,
