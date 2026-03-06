@@ -18,6 +18,13 @@ export async function login(formData: FormData) {
         redirect('/auth/login?error=' + encodeURIComponent(error.message))
     }
 
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user?.user_metadata?.role === 'admin' || user?.email === 'qnscompany88@gmail.com') {
+        revalidatePath('/admin', 'layout')
+        redirect('/admin')
+    }
+
     revalidatePath('/', 'layout')
     redirect('/')
 }

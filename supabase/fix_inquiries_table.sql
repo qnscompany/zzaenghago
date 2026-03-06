@@ -29,18 +29,16 @@ CREATE POLICY "Users can view their own inquiries" ON public.inquiries
 CREATE POLICY "Users can create their own inquiries" ON public.inquiries
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+-- Updated Admin Policies using service_role or meta-data check if possible, 
+-- but for standard Supabase JWT we can use the role from metadata if it's synced
 CREATE POLICY "Admins can view all inquiries" ON public.inquiries
     FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.users
-            WHERE public.users.id = auth.uid() AND public.users.role = 'admin'
-        )
+        (auth.jwt() ->> 'email') = 'qnscompany88@gmail.com' OR
+        (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
     );
 
 CREATE POLICY "Admins can update inquiries" ON public.inquiries
     FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM public.users
-            WHERE public.users.id = auth.uid() AND public.users.role = 'admin'
-        )
+        (auth.jwt() ->> 'email') = 'qnscompany88@gmail.com' OR
+        (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
     );

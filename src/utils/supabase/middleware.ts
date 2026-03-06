@@ -48,6 +48,15 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
+    // Admin redirection
+    if (user && (user.user_metadata.role === 'admin' || user.email === 'qnscompany88@gmail.com')) {
+        if (request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/auth/login') {
+            const url = request.nextUrl.clone()
+            url.pathname = '/admin'
+            return NextResponse.redirect(url)
+        }
+    }
+
     // Role-based redirection for companies
     if (user && user.user_metadata.role === 'company' && user.email !== 'qnscompany88@gmail.com') {
         const isDashboardPath = request.nextUrl.pathname.startsWith('/dashboard/company')
