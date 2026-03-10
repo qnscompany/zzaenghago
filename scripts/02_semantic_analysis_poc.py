@@ -10,18 +10,8 @@ from dotenv import load_dotenv
 load_dotenv(".env.local")
 load_dotenv()
 
-# API 키 설정 (사용자가 제공하거나 환경 변수에 있는 키 사용)
+# API 키 설정 (환경 변수에서만 로드)
 api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-
-if not api_key:
-    # 블로그 자동화 프로젝트 등 다른 위치에서 키 탐색 시도 (Proactive)
-    possible_env = r"c:\Users\qspar\gemini\antigravity\scratch\blog_automation\.next\standalone\.env"
-    if os.path.exists(possible_env):
-        with open(possible_env, "r", encoding="utf-8") as f:
-            for line in f:
-                if "GEMINI_API_KEY" in line:
-                    api_key = line.split("=")[1].strip().strip('"')
-                    break
 
 if not api_key:
     print("Error: Gemini API Key not found. Please set GEMINI_API_KEY in .env.local")
