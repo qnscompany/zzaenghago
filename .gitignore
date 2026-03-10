@@ -39,3 +39,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python
+.venv/
+__pycache__/
+
+# data and results
+/primary_data/
+/secondary_data/
+/visualizations/
+# /intermediate_results/ # Keep results for showcase if needed, but usually ignore
+/intermediate_results/*.json
+
+# diagnostic scripts (root)
+/*.js
+/*.mjs
+!eslint.config.mjs
+!next.config.ts
+
+# reports
+# /interim_reports/ # Keep reports if needed, but usually ignore
